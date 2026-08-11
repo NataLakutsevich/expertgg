@@ -12,13 +12,14 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
 import { colors, formElementWidth } from '../theme/theme';
 
-const LOGO_SIZE = 80; // видимый размер иконки sword-cross с учётом внутренних отступов глифа
+const EMAIL_TOP_PERCENT = 0.296;
+const PASSWORD_TOP_PERCENT = 0.366;
+const INPUT_HEIGHT = 50; // как у Log in, для единообразия
 // Log in button: top = 393/812 ≈ 48.4% of screen height, height = 50dp.
 const LOGIN_BUTTON_TOP_PERCENT = 0.484;
 const LOGIN_BUTTON_HEIGHT = 50;
@@ -58,13 +59,18 @@ export default function SignInScreen() {
       <KeyboardAvoidingView
         style={styles.inner}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={[styles.logoRow, { paddingTop: insets.top + 48 }]}>
+        <View style={[styles.logoRow, { paddingTop: insets.top + 110 }]}>
           <Image
             source={require('../assets/logo/glyph_e.png')}
             style={styles.glyphE}
             resizeMode="contain"
           />
-          <MaterialDesignIcons name="sword-cross" size={LOGO_SIZE} color={colors.textPrimary} />
+          <Image
+            source={require('../assets/icons/empty-state-swords.png')}
+            style={styles.logoSwordIcon}
+            tintColor={colors.textPrimary}
+            resizeMode="contain"
+          />
           <Image
             source={require('../assets/logo/glyph_pert.png')}
             style={styles.glyphPert}
@@ -72,29 +78,29 @@ export default function SignInScreen() {
           />
         </View>
 
-        <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={colors.textMuted}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-            editable={!isSubmitting}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor={colors.textMuted}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            editable={!isSubmitting}
-          />
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-        </View>
+        <TextInput
+          style={[styles.input, styles.inputAbsolute, { top: height * EMAIL_TOP_PERCENT }]}
+          placeholder="Email"
+          placeholderTextColor={colors.textMuted}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          editable={!isSubmitting}
+        />
+        <TextInput
+          style={[styles.input, styles.inputAbsolute, { top: height * PASSWORD_TOP_PERCENT }]}
+          placeholder="Password"
+          placeholderTextColor={colors.textMuted}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          editable={!isSubmitting}
+        />
+        {error ? (
+          <Text style={[styles.error, { top: height * PASSWORD_TOP_PERCENT + 70 }]}>{error}</Text>
+        ) : null}
 
         <TouchableOpacity
           style={[
@@ -129,30 +135,37 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   glyphE: {
-    height: 36.4,
-    width: 36.4 * (349 / 365), // ≈ 34.8
-    transform: [{ translateY: -16.2 }], // компенсация нижнего выносного элемента у "p" в "pert"
+    height: 24,
+    width: 24 * (349 / 365), // ≈ 23
+    transform: [{ translateY: -10.7 }], // компенсация нижнего выносного элемента у "p" в "pert"
   },
   glyphPert: {
-    height: 60.8,
-    width: 60.8 * (1246 / 609), // ≈ 124.4
+    height: 40,
+    width: 40 * (1246 / 609), // ≈ 81.8
   },
-  form: {
-    alignItems: 'center',
-    gap: 12,
+  logoSwordIcon: {
+    width: 34,
+    height: 34,
+    transform: [{ translateY: -6.3 }],
   },
   input: {
     width: formElementWidth,
+    height: INPUT_HEIGHT,
     backgroundColor: 'transparent',
     color: colors.textPrimary,
     borderRadius: 30,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: 20,
-    paddingVertical: 14,
     fontSize: 16,
   },
+  inputAbsolute: {
+    position: 'absolute',
+    alignSelf: 'center',
+  },
   error: {
+    position: 'absolute',
+    alignSelf: 'center',
     color: colors.danger,
     fontSize: 14,
   },
@@ -167,10 +180,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonDisabled: {
-    opacity: 0.5,
+    backgroundColor: '#2A4A8A',
   },
   buttonText: {
-    color: colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

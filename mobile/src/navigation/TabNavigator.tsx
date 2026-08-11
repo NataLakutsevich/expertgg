@@ -22,9 +22,9 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 const TAB_ICON_NAMES: Record<keyof TabParamList, MaterialDesignIconsIconName> = {
   Play: 'sword-cross',
-  History: 'history',
+  History: 'format-list-bulleted', // было 'history'
   Leaders: 'trophy',
-  Account: 'account-circle',
+  Account: 'account', // было 'account-circle'
 };
 
 // Route key stays "Leaders" (used in navigation types); the visible label
