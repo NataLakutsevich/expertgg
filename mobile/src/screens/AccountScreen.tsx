@@ -1,6 +1,119 @@
-import React from 'react';
-import PlaceholderScreen from './PlaceholderScreen';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getMe, logoutRequest, AccountProfile } from '../api/account';
+import { ApiError } from '../api/http';
+import { useAuth } from '../auth/AuthContext';
+import { colors } from '../theme/colors';
 
 export default function AccountScreen() {
-  return <PlaceholderScreen title="Account" />;
+  const insets = useSafeAreaInsets();
+  const { logout } = useAuth();
+  const [profile, setProfile] = useState<AccountProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProfile = useCallback(async () => {
+    try {
+      const me = await getMe();
+      setProfile(me);
+      setError(null);
+    } catch (e) {
+      if (!(e instanceof ApiError && e.status === 401)) {
+        setError(e instanceof Error ? e.message : 'Something went wrong.');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
+    loadProfile().finally(() => setIsLoading(false));
+  }, [loadProfile]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logoutRequest();
+    await logout();
+  };
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <Text style={styles.header}>Account</Text>
+
+      <View style={styles.content}>
+        {isLoading ? (
+          <ActivityIndicator color={colors.textPrimary} />
+        ) : profile ? (
+          <View style={styles.info}>
+            <Text style={styles.infoLine}>Username: {profile.username}</Text>
+            <Text style={styles.infoLine}>GG balance: {profile.gg_balance}</Text>
+            <Text style={styles.infoLine}>Wins: {profile.wins}</Text>
+            <Text style={styles.infoLine}>Losses: {profile.losses}</Text>
+          </View>
+        ) : null}
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={[styles.button, isLoggingOut && styles.buttonDisabled]}
+          onPress={handleLogout}
+          disabled={isLoggingOut}>
+          {isLoggingOut ? (
+            <ActivityIndicator color={colors.textPrimary} />
+          ) : (
+            <Text style={styles.buttonText}>Log out</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    color: colors.textPrimary,
+    fontSize: 28,
+    fontWeight: '700',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  info: {
+    gap: 8,
+    marginBottom: 32,
+  },
+  infoLine: {
+    color: colors.textPrimary,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: colors.accent,
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  error: {
+    color: colors.danger,
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+});
