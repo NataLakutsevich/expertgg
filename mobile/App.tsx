@@ -28,7 +28,7 @@ const navigationTheme = {
 
 function App() {
   useEffect(() => {
-    SystemNavigationBar.navigationHide();
+    SystemNavigationBar.hide();
   }, []);
 
   return (
