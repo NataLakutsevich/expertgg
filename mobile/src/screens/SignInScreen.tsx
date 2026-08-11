@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
@@ -23,6 +24,7 @@ const LOGIN_BUTTON_GAP = 12; // отступ от нижнего края пол
 const LOGIN_BUTTON_HEIGHT = 50;
 
 export default function SignInScreen() {
+  const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -56,7 +58,7 @@ export default function SignInScreen() {
       <KeyboardAvoidingView
         style={styles.inner}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.logoRow}>
+        <View style={[styles.logoRow, { paddingTop: insets.top + height * 0.172 }]}>
           <Image
             source={require('../assets/logo/glyph_e.png')}
             style={styles.glyphE}
@@ -130,7 +132,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end', // не 'center' — буквы должны стоять на одной базовой линии
     justifyContent: 'center',
     gap: 6, // тот же зазор до/после иконки мечей, что и между самими буквами
-    paddingTop: 163,
     marginBottom: 40,
   },
   glyphE: {
