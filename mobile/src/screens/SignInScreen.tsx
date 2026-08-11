@@ -13,11 +13,12 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
+import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
 import { colors, formElementWidth } from '../theme/theme';
 
-const LOGO_SIZE = 52;
+const LOGO_SIZE = 80; // видимый размер иконки sword-cross с учётом внутренних отступов глифа
 // Log in button: top = 393/812 ≈ 48.4% of screen height, height = 50dp.
 const LOGIN_BUTTON_TOP_PERCENT = 0.484;
 const LOGIN_BUTTON_HEIGHT = 50;
@@ -49,86 +50,92 @@ export default function SignInScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={[styles.logoRow, { paddingTop: insets.top + 48 }]}>
-        <Image
-          source={require('../assets/logo/glyph_e.png')}
-          style={[styles.glyphE, { tintColor: colors.textPrimary }]}
-          resizeMode="contain"
-        />
-        <MaterialDesignIcons name="sword-cross" size={LOGO_SIZE} color={colors.textPrimary} />
-        <Image
-          source={require('../assets/logo/glyph_pert.png')}
-          style={[styles.glyphPert, { tintColor: colors.textPrimary }]}
-          resizeMode="contain"
-        />
-      </View>
+    <LinearGradient
+      colors={['#001F4F', '#090C15']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.inner}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View style={[styles.logoRow, { paddingTop: insets.top + 48 }]}>
+          <Image
+            source={require('../assets/logo/glyph_e.png')}
+            style={styles.glyphE}
+            resizeMode="contain"
+          />
+          <MaterialDesignIcons name="sword-cross" size={LOGO_SIZE} color={colors.textPrimary} />
+          <Image
+            source={require('../assets/logo/glyph_pert.png')}
+            style={styles.glyphPert}
+            resizeMode="contain"
+          />
+        </View>
 
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor={colors.textMuted}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          editable={!isSubmitting}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={colors.textMuted}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          editable={!isSubmitting}
-        />
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor={colors.textMuted}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            editable={!isSubmitting}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor={colors.textMuted}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            editable={!isSubmitting}
+          />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+        </View>
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-      </View>
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          { top: height * LOGIN_BUTTON_TOP_PERCENT },
-          !canSubmit && styles.buttonDisabled,
-        ]}
-        onPress={handleSubmit}
-        disabled={!canSubmit}>
-        {isSubmitting ? (
-          <ActivityIndicator color={colors.textPrimary} />
-        ) : (
-          <Text style={styles.buttonText}>Log in</Text>
-        )}
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { top: height * LOGIN_BUTTON_TOP_PERCENT },
+            !canSubmit && styles.buttonDisabled,
+          ]}
+          onPress={handleSubmit}
+          disabled={!canSubmit}>
+          {isSubmitting ? (
+            <ActivityIndicator color={colors.textPrimary} />
+          ) : (
+            <Text style={styles.buttonText}>Log in</Text>
+          )}
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+  },
+  inner: {
+    flex: 1,
   },
   logoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end', // не 'center' — буквы должны стоять на одной базовой линии
     justifyContent: 'center',
     marginBottom: 40,
   },
   glyphE: {
-    // Source asset is 349x365; scale to LOGO_SIZE height, keep aspect ratio.
-    width: 50,
-    height: LOGO_SIZE,
+    height: 36.4,
+    width: 36.4 * (349 / 365), // ≈ 34.8
+    transform: [{ translateY: -16.2 }], // компенсация нижнего выносного элемента у "p" в "pert"
   },
   glyphPert: {
-    // Source asset is 1246x609; scale to LOGO_SIZE height, keep aspect ratio.
-    width: 106,
-    height: LOGO_SIZE,
+    height: 60.8,
+    width: 60.8 * (1246 / 609), // ≈ 124.4
   },
   form: {
     alignItems: 'center',
