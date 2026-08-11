@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getCurrentMatch, Match } from '../api/matches';
 import { ApiError } from '../api/http';
@@ -7,6 +14,7 @@ import { colors } from '../theme/theme';
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const [match, setMatch] = useState<Match | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,18 +42,22 @@ export default function PlayScreen() {
 
       <View style={styles.content}>
         {isLoading ? (
-          <ActivityIndicator color={colors.textPrimary} />
+          <View style={styles.centered}>
+            <ActivityIndicator color={colors.textPrimary} />
+          </View>
         ) : match ? (
-          <Text style={styles.statusText}>Match status: {match.status}</Text>
+          <View style={styles.centered}>
+            <Text style={styles.statusText}>Match status: {match.status}</Text>
+          </View>
         ) : (
-          <>
+          <View style={[styles.emptyState, { marginTop: height * 0.34 }]}>
             <Image
               source={require('../assets/icons/empty-state-swords.png')}
               style={[styles.emptyIcon, { tintColor: colors.textMuted }]}
               resizeMode="contain"
             />
             <Text style={styles.emptyText}>No Matches</Text>
-          </>
+          </View>
         )}
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -68,13 +80,19 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingHorizontal: 24,
+  },
+  centered: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
   },
   statusText: {
     color: colors.textPrimary,
     fontSize: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
   },
   emptyIcon: {
     width: 80,

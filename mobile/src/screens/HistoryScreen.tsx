@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getMatchHistory, MatchHistoryEntry } from '../api/matches';
 import { ApiError } from '../api/http';
@@ -20,6 +28,7 @@ function HistoryRow({ item }: { item: MatchHistoryEntry }) {
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const [history, setHistory] = useState<MatchHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +59,7 @@ export default function HistoryScreen() {
           <ActivityIndicator color={colors.textPrimary} />
         </View>
       ) : history.length === 0 ? (
-        <View style={styles.centered}>
+        <View style={[styles.emptyState, { marginTop: height * 0.34 }]}>
           <Image
             source={require('../assets/icons/empty-state-swords.png')}
             style={[styles.emptyIcon, { tintColor: colors.textMuted }]}
@@ -87,6 +96,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  emptyState: {
+    alignItems: 'center',
     paddingHorizontal: 24,
   },
   emptyIcon: {
