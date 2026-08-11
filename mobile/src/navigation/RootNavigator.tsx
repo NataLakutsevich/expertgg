@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../auth/AuthContext';
 import SignInScreen from '../screens/SignInScreen';
 import TabNavigator from './TabNavigator';
+import { colors } from '../theme/colors';
 
 export type RootStackParamList = {
   SignIn: undefined;
@@ -18,7 +19,7 @@ export default function RootNavigator() {
   if (state === 'loading') {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator color="#3B82F6" />
+        <ActivityIndicator color={colors.accent} />
       </View>
     );
   }
@@ -39,6 +40,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0F0F10',
+    backgroundColor: colors.background,
   },
 });

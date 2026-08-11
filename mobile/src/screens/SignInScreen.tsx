@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
+import { colors } from '../theme/colors';
 
 export default function SignInScreen() {
   const { login } = useAuth();
@@ -84,12 +85,12 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F0F10',
+    backgroundColor: colors.background,
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
   title: {
-    color: '#FFFFFF',
+    color: colors.textPrimary,
     fontSize: 32,
     fontWeight: '700',
     textAlign: 'center',
@@ -99,19 +100,19 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   input: {
-    backgroundColor: '#1C1C1E',
-    color: '#FFFFFF',
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
   },
   error: {
-    color: '#FF453A',
+    color: colors.danger,
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: colors.accent,
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
   },

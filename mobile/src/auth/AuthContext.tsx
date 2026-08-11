@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { login as loginRequest } from '../api/auth';
 import { clearTokens, getAccessToken, saveTokens } from './tokenStorage';
+import { registerForcedLogoutHandler } from './authEvents';
 
 type AuthState = 'loading' | 'signedOut' | 'signedIn';
 
@@ -38,6 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await clearTokens();
     setState('signedOut');
   }, []);
+
+  useEffect(() => {
+    registerForcedLogoutHandler(logout);
+  }, [logout]);
 
   const value = useMemo(() => ({ state, login, logout }), [state, login, logout]);
 

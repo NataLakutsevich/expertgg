@@ -4,22 +4,33 @@
  * @format
  */
 
-import { StatusBar, StyleSheet, useColorScheme } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { AuthProvider } from './src/auth/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import { colors } from './src/theme/colors';
+
+const navigationTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: colors.accent,
+    background: colors.background,
+    card: colors.background,
+    text: colors.textPrimary,
+    border: colors.border,
+  },
+};
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
         <AuthProvider>
-          <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
+          <NavigationContainer theme={navigationTheme}>
             <RootNavigator />
           </NavigationContainer>
         </AuthProvider>
