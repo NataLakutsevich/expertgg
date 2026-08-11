@@ -11,7 +11,7 @@ function LeaderboardRow({ item }: { item: LeaderboardEntry }) {
 
   return (
     <View style={[styles.row, item.is_current_user && styles.rowCurrent]}>
-      <Text style={styles.rank}>{item.rank}</Text>
+      <Text style={[styles.rank, item.is_current_user && styles.rankCurrent]}>{item.rank}</Text>
 
       <View style={styles.avatarWrap}>
         {avatarUrl ? (
@@ -124,6 +124,9 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 14,
     fontWeight: '600',
+  },
+  rankCurrent: {
+    color: colors.primary,
   },
   avatarWrap: {
     width: 36,
