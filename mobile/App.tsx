@@ -4,10 +4,12 @@
  * @format
  */
 
+import { useEffect } from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { AuthProvider } from './src/auth/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import { colors } from './src/theme/theme';
@@ -25,6 +27,10 @@ const navigationTheme = {
 };
 
 function App() {
+  useEffect(() => {
+    SystemNavigationBar.navigationHide();
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
