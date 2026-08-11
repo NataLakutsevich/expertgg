@@ -17,9 +17,22 @@ export async function getCurrentMatch(): Promise<Match | null> {
   return data ?? null;
 }
 
-export async function searchForMatch(): Promise<void> {
-  const response = await authFetch('/api/matches/search/', { method: 'POST' });
+export type MatchResult = 'win' | 'loss';
+
+export type MatchHistoryEntry = {
+  id: number;
+  opponent: string;
+  result: MatchResult;
+  score: string;
+  date: string;
+  [key: string]: unknown;
+};
+
+export async function getMatchHistory(): Promise<MatchHistoryEntry[]> {
+  const response = await authFetch('/api/matches/history/');
   if (!response.ok) {
-    throw new Error(`Failed to start matchmaking (${response.status}).`);
+    throw new Error(`Failed to load match history (${response.status}).`);
   }
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
