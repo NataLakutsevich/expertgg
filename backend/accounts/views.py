@@ -30,8 +30,10 @@ class LeaderboardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        queryset = Profile.objects.select_related("user").order_by(
-            "-gg_balance", "user__username"
+        queryset = (
+            Profile.objects.select_related("user")
+            .filter(user__is_staff=False, user__is_superuser=False)
+            .order_by("-gg_balance", "user__username")
         )
 
         limit = request.query_params.get("limit")
