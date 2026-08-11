@@ -50,6 +50,15 @@ class UserAdmin(BaseUserAdmin):
     def gg_balance(self, obj):
         return obj.profile.gg_balance
 
+    def get_inline_instances(self, request, obj=None):
+        # On "add", the post_save signal creates the Profile; showing
+        # ProfileInline here too makes it insert a second row with the
+        # same user_id and crash with a UNIQUE constraint error. Only
+        # show it once the User (and its Profile) already exist.
+        if obj is None:
+            return []
+        return super().get_inline_instances(request, obj)
+
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
