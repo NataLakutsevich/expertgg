@@ -7,3 +7,7 @@ export const colors = {
   textMuted: '#8A8F98',
   danger: '#FF453A',
 };
+
+// Shared width for pill-shaped form controls (inputs, primary/outline
+// buttons) so they all line up: Email/Password on SignIn, Log in, Log out.
+export const formElementWidth = '75.5%';

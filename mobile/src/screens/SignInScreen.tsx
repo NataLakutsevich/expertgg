@@ -7,16 +7,23 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
-import { colors } from '../theme/theme';
+import { colors, formElementWidth } from '../theme/theme';
 
 const LOGO_SIZE = 52;
+// Log in button: top = 393/812 ≈ 48.4% of screen height, height = 50dp.
+const LOGIN_BUTTON_TOP_PERCENT = 0.484;
+const LOGIN_BUTTON_HEIGHT = 50;
 
 export default function SignInScreen() {
+  const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,7 +51,7 @@ export default function SignInScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.logoRow}>
+      <View style={[styles.logoRow, { paddingTop: insets.top + 48 }]}>
         <Text style={styles.logoText}>e</Text>
         <MaterialDesignIcons name="sword-cross" size={LOGO_SIZE} color={colors.textPrimary} />
         <Text style={styles.logoText}>pert</Text>
@@ -73,18 +80,22 @@ export default function SignInScreen() {
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        <TouchableOpacity
-          style={[styles.button, !canSubmit && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={!canSubmit}>
-          {isSubmitting ? (
-            <ActivityIndicator color={colors.textPrimary} />
-          ) : (
-            <Text style={styles.buttonText}>Log in</Text>
-          )}
-        </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={[
+          styles.button,
+          { top: height * LOGIN_BUTTON_TOP_PERCENT },
+          !canSubmit && styles.buttonDisabled,
+        ]}
+        onPress={handleSubmit}
+        disabled={!canSubmit}>
+        {isSubmitting ? (
+          <ActivityIndicator color={colors.textPrimary} />
+        ) : (
+          <Text style={styles.buttonText}>Log in</Text>
+        )}
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
@@ -93,8 +104,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
   },
   logoRow: {
     flexDirection: 'row',
@@ -108,9 +117,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   form: {
+    alignItems: 'center',
     gap: 12,
   },
   input: {
+    width: formElementWidth,
     backgroundColor: 'transparent',
     color: colors.textPrimary,
     borderRadius: 30,
@@ -125,11 +136,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
+    position: 'absolute',
+    alignSelf: 'center',
+    width: formElementWidth,
+    height: LOGIN_BUTTON_HEIGHT,
     backgroundColor: colors.primary,
     borderRadius: 30,
-    paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 8,
+    justifyContent: 'center',
   },
   buttonDisabled: {
     opacity: 0.5,
