@@ -38,6 +38,12 @@ class MatchSearchView(APIView):
     def post(self, request):
         user = request.user
 
+        if user.is_staff or user.is_superuser:
+            return Response(
+                {"detail": "Staff and superuser accounts cannot join matchmaking."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         existing = _active_match_for(user)
         if existing is not None:
             return Response(MatchSerializer(existing).data, status=status.HTTP_200_OK)
