@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   MaterialDesignIcons,
@@ -20,8 +20,7 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const TAB_ICON_NAMES: Record<keyof TabParamList, MaterialDesignIconsIconName> = {
-  Play: 'sword-cross',
+const TAB_ICON_NAMES: Record<Exclude<keyof TabParamList, 'Play'>, MaterialDesignIconsIconName> = {
   History: 'format-list-bulleted', // было 'history'
   Leaders: 'trophy',
   Account: 'account', // было 'account-circle'
@@ -39,7 +38,16 @@ const TAB_LABELS: Record<keyof TabParamList, string> = {
 function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: string) {
   return (
     <View style={styles.tabItem}>
-      <MaterialDesignIcons name={TAB_ICON_NAMES[routeName]} size={22} color={color} />
+      {routeName === 'Play' ? (
+        <Image
+          source={require('../assets/icons/empty-state-swords.png')}
+          style={styles.playIcon}
+          tintColor={color}
+          resizeMode="contain"
+        />
+      ) : (
+        <MaterialDesignIcons name={TAB_ICON_NAMES[routeName]} size={22} color={color} />
+      )}
       <Text
         style={[styles.tabLabel, { color }]}
         numberOfLines={1}
@@ -76,6 +84,10 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.background,
     borderTopWidth: 0,
+  },
+  playIcon: {
+    width: 22,
+    height: 22,
   },
   tabItem: {
     width: '100%',
