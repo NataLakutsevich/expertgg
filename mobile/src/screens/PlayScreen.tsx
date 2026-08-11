@@ -100,7 +100,8 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: colors.textMuted,
-    fontSize: 16,
+    fontSize: 32,
+    fontWeight: '400',
     marginTop: 12,
   },
   error: {
