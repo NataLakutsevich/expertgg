@@ -49,7 +49,11 @@ export default function AccountScreen() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <TouchableOpacity
-          style={[styles.button, isLoggingOut && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            { marginBottom: 90 + insets.bottom },
+            isLoggingOut && styles.buttonDisabled,
+          ]}
           onPress={handleLogout}
           disabled={isLoggingOut}>
           {isLoggingOut ? (
@@ -90,7 +94,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 90,
   },
   buttonDisabled: {
     opacity: 0.5,
