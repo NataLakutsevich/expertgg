@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { getCurrentMatch, Match } from '../api/matches';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
@@ -40,7 +39,11 @@ export default function PlayScreen() {
           <Text style={styles.statusText}>Match status: {match.status}</Text>
         ) : (
           <>
-            <MaterialDesignIcons name="sword-cross" size={64} color={colors.textMuted} />
+            <Image
+              source={require('../assets/icons/empty-state-swords.png')}
+              style={[styles.emptyIcon, { tintColor: colors.textMuted }]}
+              resizeMode="contain"
+            />
             <Text style={styles.emptyText}>No Matches</Text>
           </>
         )}
@@ -72,6 +75,10 @@ const styles = StyleSheet.create({
   statusText: {
     color: colors.textPrimary,
     fontSize: 16,
+  },
+  emptyIcon: {
+    width: 80,
+    height: 80,
   },
   emptyText: {
     color: colors.textMuted,

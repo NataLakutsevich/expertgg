@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { getMatchHistory, MatchHistoryEntry } from '../api/matches';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
@@ -52,7 +51,11 @@ export default function HistoryScreen() {
         </View>
       ) : history.length === 0 ? (
         <View style={styles.centered}>
-          <MaterialDesignIcons name="sword-cross" size={64} color={colors.textMuted} />
+          <Image
+            source={require('../assets/icons/empty-state-swords.png')}
+            style={[styles.emptyIcon, { tintColor: colors.textMuted }]}
+            resizeMode="contain"
+          />
           <Text style={styles.emptyText}>No History</Text>
           {error ? <Text style={styles.error}>{error}</Text> : null}
         </View>
@@ -85,6 +88,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
+  },
+  emptyIcon: {
+    width: 80,
+    height: 80,
   },
   emptyText: {
     color: colors.textMuted,
