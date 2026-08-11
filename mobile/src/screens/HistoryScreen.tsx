@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { getMatchHistory, MatchHistoryEntry } from '../api/matches';
 import { ApiError } from '../api/http';
-import { colors } from '../theme/colors';
+import { colors } from '../theme/theme';
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -52,7 +52,7 @@ export default function HistoryScreen() {
         </View>
       ) : history.length === 0 ? (
         <View style={styles.centered}>
-          <MaterialDesignIcons name="sword-cross" size={64} color={colors.textSecondary} />
+          <MaterialDesignIcons name="sword-cross" size={64} color={colors.textMuted} />
           <Text style={styles.emptyText}>No History</Text>
           {error ? <Text style={styles.error}>{error}</Text> : null}
         </View>
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   emptyText: {
-    color: colors.textSecondary,
+    color: colors.textMuted,
     fontSize: 16,
     marginTop: 12,
   },

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getMe, logoutRequest, AccountProfile } from '../api/account';
 import { ApiError } from '../api/http';
 import { useAuth } from '../auth/AuthContext';
-import { colors } from '../theme/colors';
+import { colors } from '../theme/theme';
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
@@ -82,8 +82,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   button: {
-    backgroundColor: colors.accent,
-    borderRadius: 10,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.textPrimary,
+    borderRadius: 8,
     paddingVertical: 14,
     paddingHorizontal: 32,
   },

@@ -10,13 +10,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { AuthProvider } from './src/auth/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
-import { colors } from './src/theme/colors';
+import { colors } from './src/theme/theme';
 
 const navigationTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: colors.accent,
+    primary: colors.primary,
     background: colors.background,
     card: colors.background,
     text: colors.textPrimary,

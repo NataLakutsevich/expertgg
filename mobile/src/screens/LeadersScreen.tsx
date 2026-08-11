@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { getLeaderboard, resolveAvatarUrl, LeaderboardEntry } from '../api/leaderboard';
 import { ApiError } from '../api/http';
-import { colors } from '../theme/colors';
+import { colors } from '../theme/theme';
 
 function LeaderboardRow({ item }: { item: LeaderboardEntry }) {
   const avatarUrl = resolveAvatarUrl(item.avatar);
+  const initial = item.username.charAt(0).toUpperCase();
 
   return (
     <View style={[styles.row, item.is_current_user && styles.rowCurrent]}>
@@ -17,7 +17,7 @@ function LeaderboardRow({ item }: { item: LeaderboardEntry }) {
         {avatarUrl ? (
           <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
         ) : (
-          <MaterialDesignIcons name="account" size={20} color={colors.textSecondary} />
+          <Text style={styles.avatarInitial}>{initial}</Text>
         )}
       </View>
 
@@ -57,7 +57,7 @@ export default function LeadersScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Text style={styles.header}>Leaders</Text>
+      <Text style={styles.header}>Leaderboard</Text>
 
       {isLoading ? (
         <View style={styles.centered}>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   emptyText: {
-    color: colors.textSecondary,
+    color: colors.textMuted,
     fontSize: 16,
   },
   listContent: {
@@ -116,13 +116,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   rowCurrent: {
-    backgroundColor: 'rgba(59, 130, 246, 0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.4)',
+    backgroundColor: colors.surface,
   },
   rank: {
     width: 24,
-    color: colors.textSecondary,
+    color: colors.textMuted,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -130,7 +128,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -140,6 +138,11 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
   },
+  avatarInitial: {
+    color: colors.textPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+  },
   username: {
     flex: 1,
     color: colors.textPrimary,
@@ -147,10 +150,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   usernameCurrent: {
-    color: colors.accent,
+    color: colors.primary,
   },
   ggText: {
-    color: colors.textSecondary,
+    color: colors.textMuted,
     fontSize: 14,
   },
   error: {

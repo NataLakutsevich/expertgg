@@ -9,9 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
-import { colors } from '../theme/colors';
+import { colors } from '../theme/theme';
+
+const LOGO_SIZE = 52;
 
 export default function SignInScreen() {
   const { login } = useAuth();
@@ -41,13 +44,17 @@ export default function SignInScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.title}>DK</Text>
+      <View style={styles.logoRow}>
+        <Text style={styles.logoText}>e</Text>
+        <MaterialDesignIcons name="sword-cross" size={LOGO_SIZE} color={colors.textPrimary} />
+        <Text style={styles.logoText}>pert</Text>
+      </View>
 
       <View style={styles.form}>
         <TextInput
           style={styles.input}
           placeholder="Email"
-          placeholderTextColor="#8A8A8E"
+          placeholderTextColor={colors.textMuted}
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="email-address"
@@ -58,7 +65,7 @@ export default function SignInScreen() {
         <TextInput
           style={styles.input}
           placeholder="Password"
-          placeholderTextColor="#8A8A8E"
+          placeholderTextColor={colors.textMuted}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -72,7 +79,7 @@ export default function SignInScreen() {
           onPress={handleSubmit}
           disabled={!canSubmit}>
           {isSubmitting ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colors.textPrimary} />
           ) : (
             <Text style={styles.buttonText}>Log in</Text>
           )}
@@ -89,21 +96,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
-  title: {
-    color: colors.textPrimary,
-    fontSize: 32,
-    fontWeight: '700',
-    textAlign: 'center',
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 40,
+  },
+  logoText: {
+    color: colors.textPrimary,
+    fontSize: LOGO_SIZE,
+    fontWeight: '700',
   },
   form: {
     gap: 12,
   },
   input: {
-    backgroundColor: colors.surface,
+    backgroundColor: 'transparent',
     color: colors.textPrimary,
-    borderRadius: 10,
-    paddingHorizontal: 16,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 20,
     paddingVertical: 14,
     fontSize: 16,
   },
@@ -112,8 +125,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
-    backgroundColor: colors.accent,
-    borderRadius: 10,
+    backgroundColor: colors.primary,
+    borderRadius: 30,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,

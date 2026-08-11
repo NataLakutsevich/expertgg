@@ -9,7 +9,7 @@ import PlayScreen from '../screens/PlayScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import LeadersScreen from '../screens/LeadersScreen';
 import AccountScreen from '../screens/AccountScreen';
-import { colors } from '../theme/colors';
+import { colors } from '../theme/theme';
 
 export type TabParamList = {
   Play: undefined;
@@ -24,7 +24,7 @@ const TAB_ICON_NAMES: Record<keyof TabParamList, MaterialDesignIconsIconName> = 
   Play: 'sword-cross',
   History: 'history',
   Leaders: 'trophy',
-  Account: 'account',
+  Account: 'account-circle',
 };
 
 function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: string) {
@@ -44,7 +44,7 @@ export default function TabNavigator() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: colors.textPrimary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: styles.tabBar,
         tabBarIcon: ({ focused, color }) =>
           renderTabIcon(route.name as keyof TabParamList, focused, color),
@@ -60,7 +60,7 @@ export default function TabNavigator() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.background,
-    borderTopColor: colors.border,
+    borderTopWidth: 0,
   },
   tabItem: {
     alignItems: 'center',

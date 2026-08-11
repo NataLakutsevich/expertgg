@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons';
 import { getCurrentMatch, Match } from '../api/matches';
 import { ApiError } from '../api/http';
-import { colors } from '../theme/colors';
+import { colors } from '../theme/theme';
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
@@ -40,7 +40,7 @@ export default function PlayScreen() {
           <Text style={styles.statusText}>Match status: {match.status}</Text>
         ) : (
           <>
-            <MaterialDesignIcons name="sword-cross" size={64} color={colors.textSecondary} />
+            <MaterialDesignIcons name="sword-cross" size={64} color={colors.textMuted} />
             <Text style={styles.emptyText}>No Matches</Text>
           </>
         )}
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   emptyText: {
-    color: colors.textSecondary,
+    color: colors.textMuted,
     fontSize: 16,
     marginTop: 12,
   },
