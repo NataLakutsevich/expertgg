@@ -156,3 +156,23 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_ALL_ORIGINS = DEBUG
+
+# Logging: DEBUG=False + no LOGGING config means Django silently swallows
+# unhandled 500 tracebacks (only mail_admins by default, and ADMINS is empty).
+# Surface them to stderr so journalctl -u expertgg shows the real traceback.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
