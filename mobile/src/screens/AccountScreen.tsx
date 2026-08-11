@@ -9,7 +9,7 @@ import { colors } from '../theme/colors';
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
   const { logout } = useAuth();
-  const [profile, setProfile] = useState<AccountProfile | null>(null);
+  const [_profile, setProfile] = useState<AccountProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,16 +42,9 @@ export default function AccountScreen() {
       <Text style={styles.header}>Account</Text>
 
       <View style={styles.content}>
-        {isLoading ? (
-          <ActivityIndicator color={colors.textPrimary} />
-        ) : profile ? (
-          <View style={styles.info}>
-            <Text style={styles.infoLine}>Username: {profile.username}</Text>
-            <Text style={styles.infoLine}>GG balance: {profile.gg_balance}</Text>
-            <Text style={styles.infoLine}>Wins: {profile.wins}</Text>
-            <Text style={styles.infoLine}>Losses: {profile.losses}</Text>
-          </View>
-        ) : null}
+        {/* Profile stats (username/gg_balance/wins/losses) are fetched but
+            hidden until the Account mockup defines how to show them. */}
+        {isLoading ? <ActivityIndicator color={colors.textPrimary} /> : null}
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -87,14 +80,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-  },
-  info: {
-    gap: 8,
-    marginBottom: 32,
-  },
-  infoLine: {
-    color: colors.textPrimary,
-    fontSize: 16,
   },
   button: {
     backgroundColor: colors.accent,
