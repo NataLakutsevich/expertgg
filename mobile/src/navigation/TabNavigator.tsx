@@ -40,7 +40,13 @@ function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: s
   return (
     <View style={styles.tabItem}>
       <MaterialDesignIcons name={TAB_ICON_NAMES[routeName]} size={22} color={color} />
-      <Text style={[styles.tabLabel, { color }]}>{TAB_LABELS[routeName]}</Text>
+      <Text
+        style={[styles.tabLabel, { color }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}>
+        {TAB_LABELS[routeName]}
+      </Text>
       <View style={[styles.tabIndicator, focused && styles.tabIndicatorActive]} />
     </View>
   );
@@ -72,14 +78,17 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
   },
   tabItem: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
     paddingTop: 6,
+    paddingHorizontal: 2,
   },
   tabLabel: {
     fontSize: 11,
     fontWeight: '600',
+    textAlign: 'center',
   },
   tabIndicator: {
     height: 2,
