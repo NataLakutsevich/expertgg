@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyIcon: {
-    width: 80,
-    height: 80,
+    width: 56,
+    height: 56,
   },
   emptyText: {
     color: colors.textMuted,
