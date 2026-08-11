@@ -78,16 +78,17 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     paddingHorizontal: 24,
   },
   button: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.textPrimary,
-    borderRadius: 8,
+    borderColor: colors.primary,
+    borderRadius: 30,
     paddingVertical: 14,
     paddingHorizontal: 32,
+    marginBottom: 90,
   },
   buttonDisabled: {
     opacity: 0.5,

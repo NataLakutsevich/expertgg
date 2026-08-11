@@ -27,11 +27,20 @@ const TAB_ICON_NAMES: Record<keyof TabParamList, MaterialDesignIconsIconName> = 
   Account: 'account-circle',
 };
 
+// Route key stays "Leaders" (used in navigation types); the visible label
+// spells out "Leaderboard" to match the on-screen header on that tab.
+const TAB_LABELS: Record<keyof TabParamList, string> = {
+  Play: 'Play',
+  History: 'History',
+  Leaders: 'Leaderboard',
+  Account: 'Account',
+};
+
 function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: string) {
   return (
     <View style={styles.tabItem}>
       <MaterialDesignIcons name={TAB_ICON_NAMES[routeName]} size={22} color={color} />
-      <Text style={[styles.tabLabel, { color }]}>{routeName}</Text>
+      <Text style={[styles.tabLabel, { color }]}>{TAB_LABELS[routeName]}</Text>
       <View style={[styles.tabIndicator, focused && styles.tabIndicatorActive]} />
     </View>
   );
