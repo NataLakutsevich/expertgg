@@ -73,6 +73,7 @@ export default function LeadersScreen() {
           data={leaderboard}
           keyExtractor={item => String(item.rank)}
           renderItem={({ item }) => <LeaderboardRow item={item} />}
+          style={styles.list}
           contentContainerStyle={styles.listContent}
         />
       )}
@@ -101,6 +102,9 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.textMuted,
     fontSize: 16,
+  },
+  list: {
+    flex: 1,
   },
   listContent: {
     paddingHorizontal: 16,
