@@ -111,9 +111,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 10,
+    height: 66,
     paddingHorizontal: 12,
-    borderRadius: 10,
+    borderRadius: 8,
+    backgroundColor: colors.cardBackground,
   },
   rowCurrent: {
     backgroundColor: colors.surface,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -52,9 +53,17 @@ export default function SignInScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={[styles.logoRow, { paddingTop: insets.top + 48 }]}>
-        <Text style={styles.logoText}>e</Text>
+        <Image
+          source={require('../assets/logo/glyph_e.png')}
+          style={[styles.glyphE, { tintColor: colors.textPrimary }]}
+          resizeMode="contain"
+        />
         <MaterialDesignIcons name="sword-cross" size={LOGO_SIZE} color={colors.textPrimary} />
-        <Text style={styles.logoText}>pert</Text>
+        <Image
+          source={require('../assets/logo/glyph_pert.png')}
+          style={[styles.glyphPert, { tintColor: colors.textPrimary }]}
+          resizeMode="contain"
+        />
       </View>
 
       <View style={styles.form}>
@@ -111,10 +120,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 40,
   },
-  logoText: {
-    color: colors.textPrimary,
-    fontSize: LOGO_SIZE,
-    fontWeight: '700',
+  glyphE: {
+    // Source asset is 349x365; scale to LOGO_SIZE height, keep aspect ratio.
+    width: 50,
+    height: LOGO_SIZE,
+  },
+  glyphPert: {
+    // Source asset is 1246x609; scale to LOGO_SIZE height, keep aspect ratio.
+    width: 106,
+    height: LOGO_SIZE,
   },
   form: {
     alignItems: 'center',
