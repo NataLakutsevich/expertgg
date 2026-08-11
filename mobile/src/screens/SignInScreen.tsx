@@ -11,7 +11,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../auth/AuthContext';
 import { LoginError } from '../api/auth';
@@ -20,12 +19,10 @@ import { colors, formElementWidth } from '../theme/theme';
 const EMAIL_TOP_PERCENT = 0.296;
 const PASSWORD_TOP_PERCENT = 0.366;
 const INPUT_HEIGHT = 50; // как у Log in, для единообразия
-// Log in button: top = 393/812 ≈ 48.4% of screen height, height = 50dp.
-const LOGIN_BUTTON_TOP_PERCENT = 0.484;
+const LOGIN_BUTTON_GAP = 12; // отступ от нижнего края поля Password
 const LOGIN_BUTTON_HEIGHT = 50;
 
 export default function SignInScreen() {
-  const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -59,7 +56,7 @@ export default function SignInScreen() {
       <KeyboardAvoidingView
         style={styles.inner}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={[styles.logoRow, { paddingTop: insets.top + 110 }]}>
+        <View style={styles.logoRow}>
           <Image
             source={require('../assets/logo/glyph_e.png')}
             style={styles.glyphE}
@@ -105,7 +102,7 @@ export default function SignInScreen() {
         <TouchableOpacity
           style={[
             styles.button,
-            { top: height * LOGIN_BUTTON_TOP_PERCENT },
+            { top: height * PASSWORD_TOP_PERCENT + INPUT_HEIGHT + LOGIN_BUTTON_GAP },
             !canSubmit && styles.buttonDisabled,
           ]}
           onPress={handleSubmit}
@@ -132,21 +129,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end', // не 'center' — буквы должны стоять на одной базовой линии
     justifyContent: 'center',
+    gap: 6, // тот же зазор до/после иконки мечей, что и между самими буквами
+    paddingTop: 163,
     marginBottom: 40,
   },
   glyphE: {
-    height: 24,
-    width: 24 * (349 / 365), // ≈ 23
-    transform: [{ translateY: -10.7 }], // компенсация нижнего выносного элемента у "p" в "pert"
+    height: 35.7,
+    width: 35.7 * (349 / 365), // ≈ 34.2
+    transform: [{ translateY: -15.9 }], // компенсация нижнего выносного элемента у "p" в "pert"
   },
   glyphPert: {
-    height: 40,
-    width: 40 * (1246 / 609), // ≈ 81.8
+    height: 59.4,
+    width: 59.4 * (1246 / 609), // ≈ 121.5
   },
   logoSwordIcon: {
-    width: 34,
-    height: 34,
-    transform: [{ translateY: -6.3 }],
+    width: 43,
+    height: 43,
+    alignSelf: 'center', // центр иконки совпадает с серединой букв по высоте
+    transform: [{ translateY: -3 }],
   },
   input: {
     width: formElementWidth,
