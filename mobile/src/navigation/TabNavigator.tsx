@@ -25,7 +25,7 @@ const TAB_LABELS: Record<keyof TabParamList, string> = {
   Account: 'Account',
 };
 
-function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: string) {
+function renderTabIcon(routeName: keyof TabParamList, color: string) {
   const iconSource =
     routeName === 'Play'
       ? require('../assets/icons/empty-state-swords.png')
@@ -45,7 +45,6 @@ function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: s
         minimumFontScale={0.7}>
         {TAB_LABELS[routeName]}
       </Text>
-      <View style={[styles.tabIndicator, focused && styles.tabIndicatorActive]} />
     </View>
   );
 }
@@ -59,8 +58,7 @@ export default function TabNavigator() {
         tabBarActiveTintColor: colors.textPrimary,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: styles.tabBar,
-        tabBarIcon: ({ focused, color }) =>
-          renderTabIcon(route.name as keyof TabParamList, focused, color),
+        tabBarIcon: ({ color }) => renderTabIcon(route.name as keyof TabParamList, color),
       })}>
       <Tab.Screen name="Play" component={PlayScreen} />
       <Tab.Screen name="History" component={HistoryScreen} />
@@ -72,8 +70,11 @@ export default function TabNavigator() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.cardBackground,
     borderTopWidth: 0,
+    height: 64, // явная высота, чтобы контент не обрезался
+    paddingBottom: 8,
+    paddingTop: 4,
   },
   tabIcon: {
     width: 22,
@@ -84,22 +85,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    paddingTop: 6,
     paddingHorizontal: 2,
   },
   tabLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  tabIndicator: {
-    height: 2,
-    width: 20,
-    borderRadius: 1,
-    marginTop: 2,
-    backgroundColor: 'transparent',
-  },
-  tabIndicatorActive: {
-    backgroundColor: colors.textPrimary,
   },
 });
