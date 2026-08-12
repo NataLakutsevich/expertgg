@@ -16,12 +16,10 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// Route key stays "Leaders" (used in navigation types); the visible label
-// spells out "Leaderboard" to match the on-screen header on that tab.
 const TAB_LABELS: Record<keyof TabParamList, string> = {
   Play: 'Play',
   History: 'History',
-  Leaders: 'Leaderboard',
+  Leaders: 'Leaders',
   Account: 'Account',
 };
 
@@ -88,7 +86,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   tabLabel: {
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: '600',
     textAlign: 'center',
   },
