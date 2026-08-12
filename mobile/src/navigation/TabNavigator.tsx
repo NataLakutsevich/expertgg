@@ -1,10 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {
-  MaterialDesignIcons,
-  MaterialDesignIconsIconName,
-} from '@react-native-vector-icons/material-design-icons';
 import PlayScreen from '../screens/PlayScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import LeadersScreen from '../screens/LeadersScreen';
@@ -20,12 +16,6 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const TAB_ICON_NAMES: Record<Exclude<keyof TabParamList, 'Play'>, MaterialDesignIconsIconName> = {
-  History: 'format-list-bulleted', // было 'history'
-  Leaders: 'trophy',
-  Account: 'account', // было 'account-circle'
-};
-
 // Route key stays "Leaders" (used in navigation types); the visible label
 // spells out "Leaderboard" to match the on-screen header on that tab.
 const TAB_LABELS: Record<keyof TabParamList, string> = {
@@ -36,18 +26,18 @@ const TAB_LABELS: Record<keyof TabParamList, string> = {
 };
 
 function renderTabIcon(routeName: keyof TabParamList, focused: boolean, color: string) {
+  const iconSource =
+    routeName === 'Play'
+      ? require('../assets/icons/empty-state-swords.png')
+      : routeName === 'History'
+      ? require('../assets/icons/tab-history.png')
+      : routeName === 'Leaders'
+      ? require('../assets/icons/tab-leaders.png')
+      : require('../assets/icons/tab-account.png');
+
   return (
     <View style={styles.tabItem}>
-      {routeName === 'Play' ? (
-        <Image
-          source={require('../assets/icons/empty-state-swords.png')}
-          style={styles.playIcon}
-          tintColor={color}
-          resizeMode="contain"
-        />
-      ) : (
-        <MaterialDesignIcons name={TAB_ICON_NAMES[routeName]} size={22} color={color} />
-      )}
+      <Image source={iconSource} style={styles.tabIcon} tintColor={color} resizeMode="contain" />
       <Text
         style={[styles.tabLabel, { color }]}
         numberOfLines={1}
@@ -85,7 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderTopWidth: 0,
   },
-  playIcon: {
+  tabIcon: {
     width: 22,
     height: 22,
   },
