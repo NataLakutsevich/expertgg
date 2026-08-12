@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -11,6 +11,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getCurrentMatch, Match } from '../api/matches';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
+import { useFocusPolling } from '../hooks/useFocusPolling';
+
+const POLL_INTERVAL_MS = 4000;
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
@@ -28,13 +31,12 @@ export default function PlayScreen() {
       if (!(e instanceof ApiError && e.status === 401)) {
         setError(e instanceof Error ? e.message : 'Something went wrong.');
       }
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    setIsLoading(true);
-    loadCurrentMatch().finally(() => setIsLoading(false));
-  }, [loadCurrentMatch]);
+  useFocusPolling(loadCurrentMatch, POLL_INTERVAL_MS);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

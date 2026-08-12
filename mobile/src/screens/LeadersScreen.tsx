@@ -1,9 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getLeaderboard, resolveAvatarUrl, LeaderboardEntry } from '../api/leaderboard';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
+import { useFocusPolling } from '../hooks/useFocusPolling';
+
+const POLL_INTERVAL_MS = 4000;
 
 function LeaderboardRow({ item }: { item: LeaderboardEntry }) {
   const avatarUrl = resolveAvatarUrl(item.avatar);
@@ -47,13 +50,12 @@ export default function LeadersScreen() {
       if (!(e instanceof ApiError && e.status === 401)) {
         setError(e instanceof Error ? e.message : 'Something went wrong.');
       }
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    setIsLoading(true);
-    loadLeaderboard().finally(() => setIsLoading(false));
-  }, [loadLeaderboard]);
+  useFocusPolling(loadLeaderboard, POLL_INTERVAL_MS);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
