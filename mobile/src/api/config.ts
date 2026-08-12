@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'http://165.227.128.200';
+export const API_BASE_URL = 'https://165-227-128-200.sslip.io';
