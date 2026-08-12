@@ -16,6 +16,7 @@ backend/staticfiles/
 .env
 *.env
 !.env.example
+.env.bak*
 
 # Editors / OS
 .DS_Store
