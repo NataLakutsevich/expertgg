@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     height: 64, // явная высота, чтобы контент не обрезался
     paddingBottom: 8,
-    paddingTop: 4,
+    paddingTop: 7,
   },
   tabIcon: {
     width: 22,
