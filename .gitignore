@@ -18,6 +18,9 @@ backend/staticfiles/
 !.env.example
 .env.bak*
 
+# Server config backups (e.g. nginx sites-available/expertgg.bak.<timestamp>)
+*.bak.*
+
 # Editors / OS
 .DS_Store
 .idea/
