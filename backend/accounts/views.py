@@ -12,7 +12,7 @@ from .models import Profile
 
 # Fixed mock reward for "watching an ad" — no real ad SDK integration, per
 # docs/requirements_simplified2.md §1 step 7 ("это не требуется для задания").
-GET_COINS_REWARD = 50
+GET_COINS_REWARD = 2  # gg per tap
 
 
 def _serialize_profile(user):
