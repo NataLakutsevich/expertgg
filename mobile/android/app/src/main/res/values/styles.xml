@@ -1,9 +1,23 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!-- Base application theme. windowBackground matches the splash gradient so
+         there is no white flash in the gap between the native splash dismissing
+         (postSplashScreenTheme swaps to this theme) and RN's first paint. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="android:windowBackground">@drawable/splash_gradient</item>
+    </style>
+
+    <!-- Shown by MainActivity until installSplashScreen() hands off to AppTheme.
+         windowBackground is drawn by the OS the instant the process starts (before
+         installSplashScreen() or any Java code runs); the windowSplashScreen* items
+         are then drawn on top of it by the androidx SplashScreen compat/platform API. -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="windowSplashScreenBackground">@color/splashBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
 </resources>

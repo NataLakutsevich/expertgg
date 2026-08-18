@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown instantly on cold start, before the JS bundle mounts — the same
+     gradient + "expert" wordmark as src/components/AppSplash.tsx, so the
+     native placeholder and the JS splash it hands off to look continuous. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/splash_gradient" />
+    <item android:gravity="center">
+        <bitmap
+            android:src="@drawable/splash_icon"
+            android:gravity="center" />
+    </item>
+</layer-list>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Same gradient as AppSplash.tsx (#001F4F -> #090C15, top to bottom). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="#001F4F"
+        android:endColor="#090C15"
+        android:type="linear" />
+</shape>

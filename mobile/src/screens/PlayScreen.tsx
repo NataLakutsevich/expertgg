@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
 import { getMatches, placeBet, BetValidationError, Match } from '../api/matches';
 import { getMe } from '../api/account';
 import { ApiError } from '../api/http';
+import { RootStackParamList } from '../navigation/RootNavigator';
 import { colors } from '../theme/theme';
 import { useFocusPolling } from '../hooks/useFocusPolling';
 import MatchCard from '../components/MatchCard';
@@ -19,6 +22,7 @@ const HIDDEN_MODAL: ModalState = { visible: false, variant: 'success', title: ''
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [matches, setMatches] = useState<Match[]>([]);
   const [balance, setBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -81,10 +85,15 @@ export default function PlayScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>Play</Text>
-        <View style={styles.balancePill}>
+        <TouchableOpacity
+          style={styles.balancePill}
+          onPress={() => navigation.navigate('GetCoins')}>
           <MaterialDesignIcons name="wallet-outline" size={16} color={colors.textPrimary} />
           <Text style={styles.balanceText}>{balance} gg</Text>
-        </View>
+          <View style={styles.plusBadge}>
+            <MaterialDesignIcons name="plus" size={10} color={colors.background} />
+          </View>
+        </TouchableOpacity>
       </View>
 
       {isLoading ? (
@@ -162,6 +171,14 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 14,
     fontWeight: '700',
+  },
+  plusBadge: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#F5B417',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centered: {
     flex: 1,

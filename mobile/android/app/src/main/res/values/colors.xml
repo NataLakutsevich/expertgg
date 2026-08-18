@@ -1,0 +1,8 @@
+<resources>
+    <!-- Used by Theme.App.Starting (androidx.core.splashscreen, see styles.xml
+         and MainActivity.kt's installSplashScreen()). The native SplashScreen
+         API only supports a solid background (no gradient), so this matches
+         the top color of the SignIn/AppSplash gradient as the closest
+         single-color approximation of the Figma splash mock. -->
+    <color name="splashBackground">#001F4F</color>
+</resources>
