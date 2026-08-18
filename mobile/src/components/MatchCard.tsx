@@ -156,6 +156,17 @@ export default function MatchCard({
         </TouchableOpacity>
       </View>
 
+      <View style={styles.timerRow}>
+        <MaterialDesignIcons
+          name="clock-outline"
+          size={14}
+          color={match.status === 'running' ? colors.danger : colors.textMuted}
+        />
+        <Text style={[styles.timerText, match.status === 'running' && styles.timerTextLive]}>
+          {formatCountdown(match.scheduled_at, now, match.status)}
+        </Text>
+      </View>
+
       {match.user_bet ? (
         <View style={styles.betBadge}>
           <MaterialDesignIcons name="check-circle-outline" size={14} color={colors.primary} />
@@ -163,19 +174,7 @@ export default function MatchCard({
             Your bet: {match.user_bet.chosen_team} • {match.user_bet.stake} gg
           </Text>
         </View>
-      ) : (
-        <View style={styles.timerRow}>
-          <MaterialDesignIcons
-            name="clock-outline"
-            size={14}
-            color={match.status === 'running' ? colors.danger : colors.textMuted}
-          />
-          <Text
-            style={[styles.timerText, match.status === 'running' && styles.timerTextLive]}>
-            {formatCountdown(match.scheduled_at, now, match.status)}
-          </Text>
-        </View>
-      )}
+      ) : null}
 
       {isExpanded && canBet ? (
         <View style={styles.betPanel}>
