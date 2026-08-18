@@ -1,31 +1,44 @@
-import React, { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getCurrentMatch, Match } from '../api/matches';
+import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
+import { getMatches, placeBet, BetValidationError, Match } from '../api/matches';
+import { getMe } from '../api/account';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
 import { useFocusPolling } from '../hooks/useFocusPolling';
+import MatchCard from '../components/MatchCard';
+import InfoModal, { InfoModalVariant } from '../components/InfoModal';
 
-const POLL_INTERVAL_MS = 4000;
+const POLL_INTERVAL_MS = 15000;
+const TICK_INTERVAL_MS = 1000;
+
+type ModalState = { visible: boolean; variant: InfoModalVariant; title: string; message?: string };
+
+const HIDDEN_MODAL: ModalState = { visible: false, variant: 'success', title: '' };
 
 export default function PlayScreen() {
   const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
-  const [match, setMatch] = useState<Match | null>(null);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [balance, setBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modal, setModal] = useState<ModalState>(HIDDEN_MODAL);
+  const [now, setNow] = useState(() => Date.now());
 
-  const loadCurrentMatch = useCallback(async () => {
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  const loadData = useCallback(async () => {
     try {
-      const current = await getCurrentMatch();
-      setMatch(current);
+      const [allMatches, profile] = await Promise.all([getMatches(), getMe()]);
+      const playable = allMatches.filter(m => m.status === 'upcoming' || m.status === 'running');
+      setMatches(playable);
+      setBalance(profile.gg_balance);
       setError(null);
     } catch (e) {
       if (!(e instanceof ApiError && e.status === 401)) {
@@ -36,34 +49,85 @@ export default function PlayScreen() {
     }
   }, []);
 
-  useFocusPolling(loadCurrentMatch, POLL_INTERVAL_MS);
+  useFocusPolling(loadData, POLL_INTERVAL_MS);
+
+  const handleSubmitBet = useCallback(
+    async (match: Match, chosenTeam: string, stake: number) => {
+      setIsSubmitting(true);
+      try {
+        await placeBet({ match_id: match.id, chosen_team: chosenTeam, stake });
+        setExpandedId(null);
+        setModal({
+          visible: true,
+          variant: 'success',
+          title: 'Bet placed!',
+          message: `You bet ${stake} gg on ${chosenTeam}. Win ${stake * 2} gg if they take it.`,
+        });
+        await loadData();
+      } catch (e) {
+        const message =
+          e instanceof BetValidationError || e instanceof Error
+            ? e.message
+            : 'Something went wrong.';
+        setModal({ visible: true, variant: 'error', title: 'Could not place bet', message });
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [loadData],
+  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Text style={styles.header}>Play</Text>
-
-      <View style={styles.content}>
-        {isLoading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator color={colors.textPrimary} />
-          </View>
-        ) : match ? (
-          <View style={styles.centered}>
-            <Text style={styles.statusText}>Match status: {match.status}</Text>
-          </View>
-        ) : (
-          <View style={[styles.emptyState, { marginTop: height * 0.34 }]}>
-            <Image
-              source={require('../assets/icons/empty-state-swords.png')}
-              style={[styles.emptyIcon, { tintColor: colors.textMuted }]}
-              resizeMode="contain"
-            />
-            <Text style={styles.emptyText}>No Matches</Text>
-          </View>
-        )}
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+      <View style={styles.headerRow}>
+        <Text style={styles.header}>Play</Text>
+        <View style={styles.balancePill}>
+          <MaterialDesignIcons name="wallet-outline" size={16} color={colors.textPrimary} />
+          <Text style={styles.balanceText}>{balance} gg</Text>
+        </View>
       </View>
+
+      {isLoading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator color={colors.textPrimary} />
+        </View>
+      ) : matches.length === 0 ? (
+        <View style={styles.centered}>
+          <Image
+            source={require('../assets/icons/empty-state-swords.png')}
+            style={[styles.emptyIcon, { tintColor: colors.textMuted }]}
+            resizeMode="contain"
+          />
+          <Text style={styles.emptyText}>No Matches</Text>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+        </View>
+      ) : (
+        <FlatList
+          data={matches}
+          keyExtractor={item => String(item.id)}
+          contentContainerStyle={styles.listContent}
+          extraData={[expandedId, now, isSubmitting, balance]}
+          renderItem={({ item }) => (
+            <MatchCard
+              match={item}
+              now={now}
+              balance={balance}
+              isExpanded={expandedId === item.id}
+              isSubmitting={isSubmitting && expandedId === item.id}
+              onToggle={() => setExpandedId(prev => (prev === item.id ? null : item.id))}
+              onSubmitBet={(chosenTeam, stake) => handleSubmitBet(item, chosenTeam, stake)}
+            />
+          )}
+        />
+      )}
+
+      <InfoModal
+        visible={modal.visible}
+        variant={modal.variant}
+        title={modal.title}
+        message={modal.message}
+        onClose={() => setModal(HIDDEN_MODAL)}
+      />
     </View>
   );
 }
@@ -73,28 +137,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
   header: {
     color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '700',
-    paddingHorizontal: 20,
-    paddingTop: 16,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
+  balancePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.cardBackground,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  balanceText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '700',
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  statusText: {
-    color: colors.textPrimary,
-    fontSize: 16,
-  },
-  emptyState: {
-    alignItems: 'center',
+    paddingHorizontal: 24,
   },
   emptyIcon: {
     width: 56,
@@ -105,6 +178,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '400',
     marginTop: 12,
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+    gap: 12,
   },
   error: {
     color: colors.danger,

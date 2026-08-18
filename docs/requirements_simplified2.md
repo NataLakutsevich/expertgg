@@ -209,3 +209,35 @@ class Bet(models.Model):
 **Проверено локально (эта итерация):** старая таблица `matches_match` была пуста и локально, и на проде — миграцию сделали не через "one-off default", а начисто (удалили старый `0001_initial`, сгенерировали новый на чистой модели). `sync_matches` прогнан вручную с реальным PandaScore-токеном — подтянул 106 матчей; полный цикл `GET /api/matches/` → `POST /api/bets/` → `GET /api/bets/history/` проверен через Django test client, списание `gg_balance` подтверждено.
 
 **Найден и исправлен баг в `sync_matches.py`:** в `_upsert_match` фолбэк `scheduled_at = timezone.now()` для матчей без `scheduled_at`/`begin_at` стоял ПОСЛЕ вызова `Match.objects.update_or_create(...)` — но `scheduled_at` обязательное (`NOT NULL`) без дефолта на уровне модели, поэтому сама вставка нового `Match` падала с `IntegrityError` раньше, чем фолбэк успевал сработать (код после `update_or_create` в этом случае просто недостижим). Исправлено: `scheduled_at` теперь всегда попадает в `defaults` до вызова `update_or_create` (с фолбэком на `timezone.now()`, если PandaScore не прислал дату).
+
+**Уточнение к пункту 1 из "Важно" выше:** таблица `matches_match` на деле оказалась пустой и локально, и на проде, поэтому вопрос "one-off default vs очистка после миграции" не встал — миграцию сделали начисто: удалили старый `0001_initial` и сгенерировали новый на чистой модели. Пункт 1 из списка "требует действий" закрыт.
+
+**Задеплоено на сервер (коммит `b1ae0dd`).** По ходу деплоя обнаружилось, что `/opt/expertgg/backend` вообще не был git-репозиторием — весь код туда раньше доставлялся вручную (scp/heredoc), а не через `git pull`. Исправлено разово: `git init` в `/opt/expertgg` (корень проекта, `backend/` — подкаталог), remote на `https://github.com/NataLakutsevich/expertgg.git` (публичный, HTTPS без ключей), `git fetch` + `git checkout -f -b main origin/main`. Файлы вне git (`.env`, `db.sqlite3`, `media/`, `staticfiles/`, `venv/`) не тронуты — все они уже в `.gitignore`, конфликтов путей не было. Дальше на сервере (`django_migrations` ещё помнил старую `matches.0001_initial`, а старая пустая таблица `matches_match` со старой схемой лежала на месте) вручную удалили эту запись и `DROP TABLE matches_match`, поставили `requests` (`pip install -r requirements.txt`) и прогнали `manage.py migrate` — накатился чистый `0001_initial` с новыми `matches_match`/`matches_bet`. Сервис `expertgg` перезапущен, `GET /api/matches/` отдаёт корректный `401` (значит роутинг/вьюхи живы, просто нужен токен). Теперь дальше на сервере — обычный `git pull`, репозиторий настроен.
+
+**Осталось (не сделано в эту итерацию):** системный cron для `sync_matches` (`* * * * * cd /opt/expertgg/backend && venv/bin/python manage.py sync_matches >> /var/log/expertgg-sync.log 2>&1`) — без него `Match` на проде не будет обновляться и ставки не резолвятся. Ждёт явного запроса.
+
+---
+
+## 9. Статус реализации — mobile (шаги 4-6 из §1)
+
+**Готово и записано в `mobile/`:**
+
+- `src/api/matches.ts` — переписан под новый контракт: `getMatches(status?)`, `placeBet({match_id, chosen_team, stake})` (кидает `BetValidationError` с полями ошибки от DRF на 4xx), `getBetHistory()`.
+- `src/components/MatchCard.tsx` — карточка матча из §5: тап по названию/лого команды раскрывает карточку инлайн (аккордеон, не модалка), подсвечивает выбранную команду рамкой; степпер `[-] [N gg] [+]` с шагом **10 gg** (в задании размер шага не был указан — принято решение по умолчанию); числовая клавиатура (1-9, 0, "00", backspace); кнопка "Cancel" сбрасывает выбор и сворачивает карточку; кнопка "Vote" — жёлтая, текст `Vote — win {stake*2} gg` (без "+ bonus" — см. открытый вопрос §6 п.3, оставлен как есть, bonus не реализован); таймер обратного отсчёта до `scheduled_at` (`Xd Yh` / `Xh Ymin` / `Xmin` / `X sec`) либо бейдж `LIVE` для `running`. Если на матч уже есть `user_bet`, карточка не раскрывается — вместо таймера показывается "Your bet: `<team>` • `<stake>` gg".
+- `src/screens/PlayScreen.tsx` — список матчей (`FlatList`), раскрыта одновременно только одна карточка (`expandedId` на уровне экрана); хэдер "Play" + пилюля с балансом (`gg_balance` из `GET /api/account/me/`); список показывает только `status IN (upcoming, running)` — завершённые/отменённые матчи в Play не показываются (уходят в History через ставки). Поллинг раз в 15 сек (`useFocusPolling`) + отдельный тик раз в секунду только для обновления текста таймера (не дёргает API).
+- `src/screens/HistoryScreen.tsx` — карточка на ставку: бейдж статуса (`Win`/зелёный, `Lose`/красный, `Active`/жёлтый), команды (выбранная пользователем — синим), турнир+игра, дата, изменение баланса (`+payout` зелёным / `-stake` красным / `stake` нейтральным для Active).
+- `src/components/InfoModal.tsx` — универсальная модалка успеха/ошибки, показывается после `POST /api/bets/` (успех — сумма ставки и потенциальный выигрыш; ошибка — текст прямо из поля ошибки DRF, например "Insufficient gg balance.").
+- `src/components/NoInternetOverlay.tsx` + `src/hooks/useIsConnected.ts` — модалка "нет интернета", смонтирована один раз в `App.tsx` (над `NavigationContainer`), поэтому перекрывает любой экран при потере соединения, а не только Play; использует `@react-native-community/netinfo`, кнопка "Retry" дергает `NetInfo.fetch()`.
+- `package.json` — добавлена зависимость `@react-native-community/netinfo` (нативный модуль).
+
+**Требует действий на твоей стороне (не JS-хотрелоуд, нужна пересборка):**
+
+```
+cd ~/Projects/expertgg/mobile
+npm install
+npx react-native run-android   # или собрать release-APK заново, как раньше
+```
+
+`@react-native-community/netinfo` — нативный модуль, простой Fast Refresh его не подхватит, нужен полный ребилд (как и после любого `npm install` пакета с нативным кодом).
+
+**Не реализовано в эту итерацию (сознательно, вне текущего шага):** экран "Get Coins" (шаг 7 плана) и редактирование профиля (шаг 8, опционально) — значок кошелька на Play сейчас только показывает баланс, без перехода. Модалка "недостаточно средств" отдельно не заведена — она покрывается общей `InfoModal` с ошибкой `error`, текст берётся из ответа сервера (`{"stake": "Insufficient gg balance."}`), что функционально эквивалентно.

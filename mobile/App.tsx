@@ -12,6 +12,7 @@ import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { AuthProvider } from './src/auth/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import NoInternetOverlay from './src/components/NoInternetOverlay';
 import { colors } from './src/theme/theme';
 
 const navigationTheme = {
@@ -39,6 +40,9 @@ function App() {
           <NavigationContainer theme={navigationTheme}>
             <RootNavigator />
           </NavigationContainer>
+          {/* Mounted at the root so a lost connection is caught on every screen,
+              not just ones that happen to be mid-request. */}
+          <NoInternetOverlay />
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
