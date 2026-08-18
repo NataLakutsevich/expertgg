@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- API 31+ always draws windowSplashScreenAnimatedIcon inside a circular
+     mask sized for a square adaptive icon. Our logo is a wide wordmark, so
+     forcing it into that mask crops/zooms it into an ugly circle — this
+     transparent placeholder keeps that masked slot empty; the actual
+     wordmark is drawn full-width, unmasked, via android:windowBackground
+     (see launch_screen.xml) instead. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#00000000" />
+</shape>

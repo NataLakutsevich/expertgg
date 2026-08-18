@@ -1,22 +1,27 @@
 <resources>
 
-    <!-- Base application theme. windowBackground matches the splash gradient so
-         there is no white flash in the gap between the native splash dismissing
-         (postSplashScreenTheme swaps to this theme) and RN's first paint. -->
+    <!-- Base application theme. windowBackground matches the full splash (gradient +
+         wordmark) so the logo stays on screen continuously through the gap between
+         the native splash dismissing (postSplashScreenTheme swaps to this theme) and
+         RN's first paint — otherwise the logo would blink out then back in as soon as
+         AppSplash.tsx mounts, reading as two separate splashes instead of one. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
-        <item name="android:windowBackground">@drawable/splash_gradient</item>
+        <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
     <!-- Shown by MainActivity until installSplashScreen() hands off to AppTheme.
          windowBackground is drawn by the OS the instant the process starts (before
          installSplashScreen() or any Java code runs); the windowSplashScreen* items
-         are then drawn on top of it by the androidx SplashScreen compat/platform API. -->
+         are then drawn on top of it by the androidx SplashScreen compat/platform API.
+         windowSplashScreenAnimatedIcon is left transparent on purpose: API 31+ always
+         renders that icon inside a circular adaptive-icon mask, which badly crops a
+         wide wordmark — the actual logo is the unmasked windowBackground bitmap above. -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="android:windowBackground">@drawable/launch_screen</item>
         <item name="windowSplashScreenBackground">@color/splashBackground</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/transparent</item>
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
