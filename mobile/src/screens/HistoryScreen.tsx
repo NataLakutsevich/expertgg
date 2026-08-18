@@ -1,9 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getBetHistory, BetHistoryEntry, BetStatus } from '../api/matches';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
+import { useFocusPolling } from '../hooks/useFocusPolling';
+
+const POLL_INTERVAL_MS = 15000;
 
 const STATUS_LABEL: Record<BetStatus, string> = {
   won: 'Win',
@@ -85,13 +88,12 @@ export default function HistoryScreen() {
       if (!(e instanceof ApiError && e.status === 401)) {
         setError(e instanceof Error ? e.message : 'Something went wrong.');
       }
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    setIsLoading(true);
-    loadHistory().finally(() => setIsLoading(false));
-  }, [loadHistory]);
+  useFocusPolling(loadHistory, POLL_INTERVAL_MS);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
