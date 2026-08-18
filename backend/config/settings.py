@@ -20,6 +20,10 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
+# PandaScore data feed (https://developers.pandascore.co) — used by
+# `matches/pandascore.py` and the `sync_matches` cron command.
+PANDASCORE_API_TOKEN = env("PANDASCORE_API_TOKEN", default="")
+
 
 # Application definition
 

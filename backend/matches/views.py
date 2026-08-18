@@ -1,88 +1,81 @@
-from django.db.models import Q
-from django.http import JsonResponse
+from django.db import IntegrityError, transaction
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Match
-from .serializers import MatchHistorySerializer, MatchSerializer
+from accounts.models import Profile
+
+from .models import Bet, Match
+from .serializers import BetCreateSerializer, BetHistorySerializer, MatchSerializer
 
 
-def _active_match_for(user):
-    return (
-        Match.objects.filter(Q(player1=user) | Q(player2=user))
-        .exclude(status=Match.Status.FINISHED)
-        .order_by("-created_at")
-        .first()
-    )
+class MatchListView(generics.ListAPIView):
+    """GET /api/matches/ — the Play screen's match list.
 
+    Optional ?status=upcoming|running|finished filters; cancelled matches are
+    never shown. Each match includes the requesting user's own bet, if any.
+    """
 
-class CurrentMatchView(APIView):
+    serializer_class = MatchSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        match = _active_match_for(request.user)
-        if match is None:
-            # DRF's Response(None) renders an empty body instead of a JSON
-            # `null`, so use JsonResponse to match the documented contract.
-            return JsonResponse(None, safe=False)
-        return Response(MatchSerializer(match).data)
+    def get_queryset(self):
+        queryset = Match.objects.exclude(status=Match.Status.CANCELLED).prefetch_related("bets")
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        return queryset
+
+    def get_serializer_context(self):
+        return {"request": self.request}
 
 
-class MatchSearchView(APIView):
-    """POST starts/joins a search, DELETE cancels a pending search."""
+class BetCreateView(APIView):
+    """POST /api/bets/ — place a bet: {match, chosen_team, stake}.
+
+    The stake is debited from the user's gg balance immediately (escrow model):
+    a win later credits stake*2 (net +stake), a loss credits nothing back
+    (the staked gg was already forfeited at bet time).
+    """
 
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user
+        serializer = BetCreateSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        stake = serializer.validated_data["stake"]
 
-        if user.is_staff or user.is_superuser:
+        try:
+            with transaction.atomic():
+                profile = Profile.objects.select_for_update().get(user=request.user)
+                if stake > profile.gg_balance:
+                    return Response(
+                        {"stake": "Insufficient gg balance."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                profile.gg_balance -= stake
+                profile.save(update_fields=["gg_balance"])
+                bet = serializer.save(user=request.user)
+        except IntegrityError:
+            # Lost a race against another request placing the same active bet.
             return Response(
-                {"detail": "Staff and superuser accounts cannot join matchmaking."},
-                status=status.HTTP_403_FORBIDDEN,
+                {"match": "You already have an active bet on this match."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        existing = _active_match_for(user)
-        if existing is not None:
-            return Response(MatchSerializer(existing).data, status=status.HTTP_200_OK)
-
-        waiting = (
-            Match.objects.filter(status=Match.Status.SEARCHING, player2__isnull=True)
-            .exclude(player1=user)
-            .order_by("created_at")
-            .first()
-        )
-        if waiting is not None:
-            waiting.player2 = user
-            waiting.status = Match.Status.ACTIVE
-            waiting.save(update_fields=["player2", "status"])
-            return Response(MatchSerializer(waiting).data, status=status.HTTP_200_OK)
-
-        match = Match.objects.create(player1=user, status=Match.Status.SEARCHING)
-        return Response(MatchSerializer(match).data, status=status.HTTP_201_CREATED)
-
-    def delete(self, request):
-        deleted, _ = Match.objects.filter(
-            player1=request.user,
-            status=Match.Status.SEARCHING,
-            player2__isnull=True,
-        ).delete()
-        if not deleted:
-            return Response(
-                {"detail": "No pending search to cancel."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(BetCreateSerializer(bet).data, status=status.HTTP_201_CREATED)
 
 
-class MatchHistoryView(generics.ListAPIView):
-    serializer_class = MatchHistorySerializer
+class BetHistoryView(generics.ListAPIView):
+    """GET /api/bets/history/ — the History screen: active, won and lost bets."""
+
+    serializer_class = BetHistorySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        return Match.objects.filter(
-            Q(player1=user) | Q(player2=user), status=Match.Status.FINISHED
-        ).order_by("-finished_at")
+        return (
+            Bet.objects.filter(user=self.request.user)
+            .select_related("match")
+            .order_by("-created_at")
+        )

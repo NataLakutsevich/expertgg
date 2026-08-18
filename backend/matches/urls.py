@@ -1,9 +1,9 @@
 from django.urls import path
 
-from .views import CurrentMatchView, MatchHistoryView, MatchSearchView
+from .views import BetCreateView, BetHistoryView, MatchListView
 
 urlpatterns = [
-    path("matches/current/", CurrentMatchView.as_view(), name="matches-current"),
-    path("matches/search/", MatchSearchView.as_view(), name="matches-search"),
-    path("matches/history/", MatchHistoryView.as_view(), name="matches-history"),
+    path("matches/", MatchListView.as_view(), name="matches-list"),
+    path("bets/", BetCreateView.as_view(), name="bets-create"),
+    path("bets/history/", BetHistoryView.as_view(), name="bets-history"),
 ]
