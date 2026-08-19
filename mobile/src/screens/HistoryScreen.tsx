@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   teamsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 30,
   },
   teamBox: {
     flex: 1,
