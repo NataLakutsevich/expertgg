@@ -64,6 +64,11 @@ export default function MatchCard({
     if (!canBet) {
       return;
     }
+    if (isExpanded && chosenTeam === team) {
+      // Tapping the already-selected team again closes the panel, same as Cancel.
+      handleCancel();
+      return;
+    }
     if (!isExpanded) {
       onToggle();
       setStakeText('1'); // minimum stake, so the stepper never starts on an invalid 0
