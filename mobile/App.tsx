@@ -29,7 +29,11 @@ const navigationTheme = {
 
 function App() {
   useEffect(() => {
-    SystemNavigationBar.hide();
+    // Best-effort only: if the Activity is not attached yet at this exact
+    // moment (e.g. still mid cold-start/lock-screen transition), this rejects
+    // with "no current Activity" — an uncaught rejection that otherwise shows
+    // as a full-screen JS error in dev builds even though nothing is broken.
+    SystemNavigationBar.hide().catch(() => {});
   }, []);
 
   return (
