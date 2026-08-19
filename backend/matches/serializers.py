@@ -104,6 +104,9 @@ class BetHistorySerializer(serializers.ModelSerializer):
     videogame = serializers.CharField(source="match.videogame")
     tournament_name = serializers.CharField(source="match.tournament_name")
     winner_name = serializers.CharField(source="match.winner_name")
+    # Distinct from the bet's own "status" (active/won/lost) — lets an active
+    # bet's card show "Starting"/"Live" instead of a date it does not have yet.
+    match_status = serializers.CharField(source="match.status")
 
     class Meta:
         model = Bet
@@ -114,6 +117,7 @@ class BetHistorySerializer(serializers.ModelSerializer):
             "videogame",
             "tournament_name",
             "winner_name",
+            "match_status",
             "chosen_team",
             "stake",
             "status",

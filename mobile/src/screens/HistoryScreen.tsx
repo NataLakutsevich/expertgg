@@ -31,6 +31,12 @@ function formatDate(value: string): string {
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 }
 
+// An active bet has no resolution date yet — show the underlying match's
+// live state instead of a misleading fallback timestamp.
+function formatMatchState(item: BetHistoryEntry): string {
+  return item.match_status === 'running' ? 'Live' : 'Starting';
+}
+
 function formatDelta(item: BetHistoryEntry): { text: string; color: string } {
   if (item.status === 'won') {
     return { text: `+${item.payout} gg`, color: STATUS_COLOR.won };
@@ -72,7 +78,17 @@ function HistoryCard({ item }: { item: BetHistoryEntry }) {
       </View>
 
       <View style={styles.cardBottomRow}>
-        <Text style={styles.date}>{formatDate(item.resolved_at ?? item.created_at)}</Text>
+        {item.status === 'active' ? (
+          <Text
+            style={[
+              styles.date,
+              item.match_status === 'running' && styles.matchStateLive,
+            ]}>
+            {formatMatchState(item)}
+          </Text>
+        ) : (
+          <Text style={styles.date}>{formatDate(item.resolved_at ?? item.created_at)}</Text>
+        )}
         <Text style={[styles.delta, { color: delta.color }]}>{delta.text}</Text>
       </View>
     </View>
@@ -224,6 +240,10 @@ const styles = StyleSheet.create({
   date: {
     color: colors.textMuted,
     fontSize: 12,
+  },
+  matchStateLive: {
+    color: colors.danger,
+    fontWeight: '700',
   },
   delta: {
     fontSize: 14,

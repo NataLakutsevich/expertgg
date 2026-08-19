@@ -92,6 +92,7 @@ export type BetHistoryEntry = {
   videogame: string;
   tournament_name: string;
   winner_name: string | null;
+  match_status: MatchStatus;
   chosen_team: string;
   stake: number;
   status: BetStatus;
