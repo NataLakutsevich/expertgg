@@ -5,7 +5,7 @@ import { Match } from '../api/matches';
 import { colors } from '../theme/theme';
 import { formatCountdown } from '../utils/countdown';
 
-const STEP = 10;
+const STEP = 1;
 const MAX_STAKE_DIGITS = 6; // generous upper bound on typed stake length
 const BORDER = '#666C7C'; // team box / numpad key outline, per Figma Vote card spec
 
