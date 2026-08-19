@@ -136,10 +136,10 @@ export default function MatchCard({
           ]}
           disabled={!canBet}
           onPress={() => handleSelectTeam(match.team2_name)}>
+          <TeamLogo name={match.team2_name} url={match.team2_logo_url} />
           <Text style={styles.teamBoxText} numberOfLines={1}>
             {match.team2_name}
           </Text>
-          <TeamLogo name={match.team2_name} url={match.team2_logo_url} />
         </TouchableOpacity>
       </View>
 
@@ -234,14 +234,16 @@ export default function MatchCard({
       ) : null}
 
       <View style={styles.timerRow}>
-        <MaterialDesignIcons
-          name="clock-outline"
-          size={14}
-          color={match.status === 'running' ? colors.danger : colors.textMuted}
-        />
-        <Text style={[styles.timerText, match.status === 'running' && styles.timerTextLive]}>
-          {formatCountdown(match.scheduled_at, now, match.status)}
-        </Text>
+        <View style={styles.timerBadge}>
+          <MaterialDesignIcons
+            name="clock-outline"
+            size={14}
+            color={match.status === 'running' ? colors.danger : colors.textMuted}
+          />
+          <Text style={[styles.timerText, match.status === 'running' && styles.timerTextLive]}>
+            {formatCountdown(match.scheduled_at, now, match.status)}
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -314,11 +316,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   timerRow: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  timerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 6,
-    marginTop: 8,
+    backgroundColor: '#090C15',
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   timerText: {
     color: colors.textMuted,
