@@ -66,6 +66,7 @@ export default function MatchCard({
     }
     if (!isExpanded) {
       onToggle();
+      setStakeText('1'); // minimum stake, so the stepper never starts on an invalid 0
     }
     setChosenTeam(team);
   };
@@ -85,7 +86,7 @@ export default function MatchCard({
   };
 
   const adjustStake = (delta: number) => {
-    setStakeText(String(Math.max(0, stake + delta)));
+    setStakeText(String(Math.max(1, stake + delta)));
   };
 
   const handleVote = () => {
