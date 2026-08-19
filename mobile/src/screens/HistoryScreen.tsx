@@ -1,12 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getBetHistory, BetHistoryEntry, BetStatus } from '../api/matches';
 import { ApiError } from '../api/http';
 import { colors } from '../theme/theme';
 import { useFocusPolling } from '../hooks/useFocusPolling';
+import { formatCountdown } from '../utils/countdown';
 
 const POLL_INTERVAL_MS = 15000;
+const TICK_INTERVAL_MS = 30000;
 
 const STATUS_LABEL: Record<BetStatus, string> = {
   won: 'Win',
@@ -31,12 +33,6 @@ function formatDate(value: string): string {
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 }
 
-// An active bet has no resolution date yet — show the underlying match's
-// live state instead of a misleading fallback timestamp.
-function formatMatchState(item: BetHistoryEntry): string {
-  return item.match_status === 'running' ? 'Live' : 'Starting';
-}
-
 function formatDelta(item: BetHistoryEntry): { text: string; color: string } {
   if (item.status === 'won') {
     return { text: `+${item.payout} gg`, color: STATUS_COLOR.won };
@@ -47,7 +43,7 @@ function formatDelta(item: BetHistoryEntry): { text: string; color: string } {
   return { text: `${item.stake} gg`, color: colors.textMuted };
 }
 
-function HistoryCard({ item }: { item: BetHistoryEntry }) {
+function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
   const delta = formatDelta(item);
 
   return (
@@ -84,7 +80,7 @@ function HistoryCard({ item }: { item: BetHistoryEntry }) {
               styles.date,
               item.match_status === 'running' && styles.matchStateLive,
             ]}>
-            {formatMatchState(item)}
+            {formatCountdown(item.scheduled_at, now, item.match_status)}
           </Text>
         ) : (
           <Text style={styles.date}>{formatDate(item.resolved_at ?? item.created_at)}</Text>
@@ -100,6 +96,12 @@ export default function HistoryScreen() {
   const [history, setHistory] = useState<BetHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -139,7 +141,8 @@ export default function HistoryScreen() {
         <FlatList
           data={history}
           keyExtractor={item => String(item.id)}
-          renderItem={({ item }) => <HistoryCard item={item} />}
+          extraData={now}
+          renderItem={({ item }) => <HistoryCard item={item} now={now} />}
           style={styles.list}
           contentContainerStyle={styles.listContent}
         />

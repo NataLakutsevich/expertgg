@@ -3,29 +3,10 @@ import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } fr
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
 import { Match } from '../api/matches';
 import { colors } from '../theme/theme';
+import { formatCountdown } from '../utils/countdown';
 
 const STEP = 10;
 const MAX_STAKE_DIGITS = 6; // generous upper bound on typed stake length
-
-function formatCountdown(scheduledAt: string, now: number, status: Match['status']): string {
-  if (status === 'running') {
-    return 'LIVE';
-  }
-  const target = new Date(scheduledAt).getTime();
-  const diffMs = target - now;
-  if (Number.isNaN(target) || diffMs <= 0) {
-    return 'Starting...';
-  }
-  const totalSeconds = Math.floor(diffMs / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}min`;
-  if (minutes > 0) return `${minutes}min`;
-  return `${seconds} sec`;
-}
 
 function TeamLogo({ name, url }: { name: string; url: string }) {
   if (url) {

@@ -93,6 +93,7 @@ export type BetHistoryEntry = {
   tournament_name: string;
   winner_name: string | null;
   match_status: MatchStatus;
+  scheduled_at: string;
   chosen_team: string;
   stake: number;
   status: BetStatus;
