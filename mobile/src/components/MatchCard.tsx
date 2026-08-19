@@ -322,11 +322,13 @@ const styles = StyleSheet.create({
   timerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'center',
+    gap: 10,
+    minHeight: 25,
     backgroundColor: '#090C15',
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
   },
   timerText: {
     color: colors.textMuted,
