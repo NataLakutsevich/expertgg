@@ -100,7 +100,9 @@ class BetHistorySerializer(serializers.ModelSerializer):
     """Flattened match + bet info for the History screen's Win/Lose/Active cards."""
 
     team1_name = serializers.CharField(source="match.team1_name")
+    team1_logo_url = serializers.CharField(source="match.team1_logo_url")
     team2_name = serializers.CharField(source="match.team2_name")
+    team2_logo_url = serializers.CharField(source="match.team2_logo_url")
     videogame = serializers.CharField(source="match.videogame")
     tournament_name = serializers.CharField(source="match.tournament_name")
     winner_name = serializers.CharField(source="match.winner_name")
@@ -114,7 +116,9 @@ class BetHistorySerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "team1_name",
+            "team1_logo_url",
             "team2_name",
+            "team2_logo_url",
             "videogame",
             "tournament_name",
             "winner_name",

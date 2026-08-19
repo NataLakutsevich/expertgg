@@ -88,7 +88,9 @@ export async function placeBet(payload: PlaceBetPayload): Promise<PlacedBet> {
 export type BetHistoryEntry = {
   id: number;
   team1_name: string;
+  team1_logo_url: string;
   team2_name: string;
+  team2_logo_url: string;
   videogame: string;
   tournament_name: string;
   winner_name: string | null;

@@ -27,6 +27,20 @@ const STATUS_COLOR: Record<BetStatus, string> = {
   active: '#F5B417',
 };
 
+function TeamLogo({ url }: { url: string }) {
+  if (url) {
+    return <Image source={{ uri: url }} style={styles.teamLogo} resizeMode="contain" />;
+  }
+  return (
+    <Image
+      source={require('../assets/icons/empty-state-swords.png')}
+      style={styles.teamLogo}
+      tintColor="#FFFFFF"
+      resizeMode="contain"
+    />
+  );
+}
+
 // For Win/Lose, shows when the match actually finished and the payout was
 // resolved (resolved_at) rather than when the bet was originally placed.
 // Active bets have no resolved_at yet, so they fall back to created_at.
@@ -77,20 +91,10 @@ function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
           <Text style={styles.teamBoxText} numberOfLines={1}>
             {item.team1_name}
           </Text>
-          <Image
-            source={require('../assets/icons/empty-state-swords.png')}
-            style={styles.teamLogo}
-            tintColor="#FFFFFF"
-            resizeMode="contain"
-          />
+          <TeamLogo url={item.team1_logo_url} />
         </View>
         <View style={[styles.teamBox, isTeam2Chosen && styles.teamBoxSelected]}>
-          <Image
-            source={require('../assets/icons/empty-state-swords.png')}
-            style={styles.teamLogo}
-            tintColor="#FFFFFF"
-            resizeMode="contain"
-          />
+          <TeamLogo url={item.team2_logo_url} />
           <Text style={styles.teamBoxText} numberOfLines={1}>
             {item.team2_name}
           </Text>
