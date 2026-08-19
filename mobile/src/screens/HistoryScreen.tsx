@@ -107,9 +107,7 @@ function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
         ) : (
           <Text style={styles.date}>{formatDate(item.resolved_at ?? item.created_at)}</Text>
         )}
-        <View style={[styles.deltaBadge, { borderColor: statusColor }]}>
-          <Text style={[styles.deltaBadgeText, { color: statusColor }]}>{formatDelta(item)}</Text>
-        </View>
+        <Text style={[styles.deltaText, { color: statusColor }]}>{formatDelta(item)}</Text>
       </View>
     </View>
   );
@@ -313,14 +311,8 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontWeight: '700',
   },
-  deltaBadge: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  deltaBadgeText: {
-    fontSize: 13,
+  deltaText: {
+    fontSize: 14,
     fontWeight: '700',
   },
   error: {
