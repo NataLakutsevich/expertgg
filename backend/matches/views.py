@@ -68,14 +68,25 @@ class BetCreateView(APIView):
 
 
 class BetHistoryView(generics.ListAPIView):
-    """GET /api/bets/history/ — the History screen: active, won and lost bets."""
+    """GET /api/bets/history/ — the History screen: active, won and lost bets.
+
+    Active bets (still live/starting) sort first, earliest match start time
+    first; resolved (won/lost) bets follow, most recently resolved first.
+    """
 
     serializer_class = BetHistorySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return (
-            Bet.objects.filter(user=self.request.user)
-            .select_related("match")
-            .order_by("-created_at")
+        bets = list(
+            Bet.objects.filter(user=self.request.user).select_related("match")
         )
+
+        def sort_key(bet):
+            if bet.status == Bet.Status.ACTIVE:
+                return (0, bet.match.scheduled_at)
+            resolved = bet.resolved_at or bet.created_at
+            return (1, -resolved.timestamp())
+
+        bets.sort(key=sort_key)
+        return bets
