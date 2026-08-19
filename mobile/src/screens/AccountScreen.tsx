@@ -339,8 +339,10 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '500',
+    lineHeight: 18,
+    letterSpacing: -0.24,
   },
   usernameInput: {
     width: formElementWidth,
