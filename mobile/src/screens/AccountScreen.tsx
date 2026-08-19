@@ -150,7 +150,7 @@ export default function AccountScreen() {
                     source={{ uri: avatarUrl }}
                     resizeMode="cover"
                     style={[
-                      styles.avatarBorder,
+                      mode === 'edit' && styles.avatarBorder,
                       { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 },
                     ]}
                   />
@@ -158,7 +158,7 @@ export default function AccountScreen() {
                   <View
                     style={[
                       styles.avatarFallback,
-                      styles.avatarBorder,
+                      mode === 'edit' && styles.avatarBorder,
                       { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 },
                     ]}>
                     <Text style={styles.avatarInitial}>{initial}</Text>
