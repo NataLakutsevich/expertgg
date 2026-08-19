@@ -61,9 +61,7 @@ function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
     <View style={styles.card}>
       <View style={styles.cardTopRow}>
         <View style={[styles.statusBadge, { borderColor: statusColor }]}>
-          <Text style={[styles.statusBadgeText, { color: statusColor }]}>
-            {STATUS_LABEL[item.status]}
-          </Text>
+          <Text style={styles.statusBadgeText}>{STATUS_LABEL[item.status]}</Text>
         </View>
         <Text style={styles.tournament} numberOfLines={1}>
           {item.videogame}:  {item.tournament_name}
@@ -261,6 +259,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   statusBadgeText: {
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
   },
