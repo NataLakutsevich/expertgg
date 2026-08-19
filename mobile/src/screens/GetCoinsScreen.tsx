@@ -76,11 +76,18 @@ export default function GetCoinsScreen() {
 
       <View style={styles.content}>
         <Text style={styles.cardTitle}>Free Coins</Text>
-        <Image
-          source={require('../assets/icons/coins.png')}
-          style={styles.coinIcon}
-          resizeMode="contain"
-        />
+        <View style={styles.coinWrap}>
+          <Image
+            source={require('../assets/icons/coins-glow.png')}
+            style={styles.coinGlow}
+            resizeMode="contain"
+          />
+          <Image
+            source={require('../assets/icons/coins.png')}
+            style={styles.coinIcon}
+            resizeMode="contain"
+          />
+        </View>
         <TouchableOpacity
           style={[styles.claimButton, isClaiming && styles.claimButtonDisabled]}
           onPress={handleGetCoins}
@@ -89,9 +96,7 @@ export default function GetCoinsScreen() {
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <>
-              <View style={styles.claimButtonIconWrap}>
-                <MaterialDesignIcons name="play-box-outline" size={14} color="#FFFFFF" />
-              </View>
+              <MaterialDesignIcons name="play-box-outline" size={20} color="#FFFFFF" />
               <Text style={styles.claimButtonText}>Get coins</Text>
             </>
           )}
@@ -165,9 +170,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
   },
+  coinWrap: {
+    width: 200,
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  coinGlow: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+  },
   coinIcon: {
-    width: 160,
-    height: 160,
+    width: 100,
+    height: 100,
   },
   claimButton: {
     flexDirection: 'row',
@@ -178,15 +194,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 30,
     paddingVertical: 16,
-  },
-  claimButtonIconWrap: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   claimButtonDisabled: {
     opacity: 0.6,
