@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 20,
     fontWeight: '700',
+    textAlign: 'center',
   },
   balancePill: {
     flexDirection: 'row',

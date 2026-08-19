@@ -13,7 +13,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { launchImageLibrary } from 'react-native-image-picker';
-import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
 import { getMe, updateMe, logoutRequest, AccountProfile } from '../api/account';
 import { resolveAvatarUrl } from '../api/leaderboard';
 import { ApiError } from '../api/http';
@@ -166,21 +165,13 @@ export default function AccountScreen() {
                   </View>
                 )}
                 {mode === 'edit' ? (
-                  <View
+                  <Image
+                    source={require('../assets/icons/avatar-plus.png')}
                     style={[
                       styles.avatarPlusBadge,
-                      {
-                        width: avatarSize * 0.32,
-                        height: avatarSize * 0.32,
-                        borderRadius: (avatarSize * 0.32) / 2,
-                      },
-                    ]}>
-                    <MaterialDesignIcons
-                      name="plus"
-                      size={avatarSize * 0.18}
-                      color="#FFFFFF"
-                    />
-                  </View>
+                      { width: avatarSize * 0.32, height: avatarSize * 0.32 },
+                    ]}
+                  />
                 ) : null}
               </TouchableOpacity>
 
@@ -297,11 +288,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     bottom: 0,
-    backgroundColor: colors.primary,
-    borderWidth: 2,
-    borderColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   balancePill: {
     flexDirection: 'row',
