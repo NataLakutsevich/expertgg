@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
+import LinearGradient from 'react-native-linear-gradient';
 import { getMe, getCoins } from '../api/account';
 import { ApiError } from '../api/http';
 import { RootStackParamList } from '../navigation/RootNavigator';
@@ -63,7 +64,7 @@ export default function GetCoinsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
+      <LinearGradient colors={['#191B28', '#000000']} style={styles.headerRow}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <MaterialDesignIcons name="chevron-left" size={26} color={colors.textPrimary} />
         </TouchableOpacity>
@@ -72,7 +73,7 @@ export default function GetCoinsScreen() {
           <Text style={styles.balanceText}>{isLoading ? '…' : `${balance} gg`}</Text>
           <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
         </View>
-      </View>
+      </LinearGradient>
 
       <View style={styles.content}>
         <View style={styles.card}>

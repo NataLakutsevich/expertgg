@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import LinearGradient from 'react-native-linear-gradient';
 import { getLeaderboard, resolveAvatarUrl, LeaderboardEntry } from '../api/leaderboard';
 import { getMe } from '../api/account';
 import { ApiError } from '../api/http';
@@ -66,13 +67,13 @@ export default function LeadersScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
+      <LinearGradient colors={['#191B28', '#000000']} style={styles.headerRow}>
         <Text style={styles.header}>Leaderboard</Text>
         <TouchableOpacity style={styles.balancePill} onPress={() => navigation.navigate('GetCoins')}>
           <Text style={styles.balanceText}>{balance} gg</Text>
           <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
         </TouchableOpacity>
-      </View>
+      </LinearGradient>
 
       {isLoading ? (
         <View style={styles.centered}>

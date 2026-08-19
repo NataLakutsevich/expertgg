@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -127,13 +128,13 @@ export default function AccountScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
+      <LinearGradient colors={['#191B28', '#000000']} style={styles.headerRow}>
         <Text style={styles.header}>Account</Text>
         <TouchableOpacity style={styles.balancePill} onPress={() => navigation.navigate('GetCoins')}>
           <Text style={styles.balanceText}>{profile?.gg_balance ?? 0} gg</Text>
           <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
         </TouchableOpacity>
-      </View>
+      </LinearGradient>
 
       <View style={styles.content}>
         <View style={styles.topGroup}>
