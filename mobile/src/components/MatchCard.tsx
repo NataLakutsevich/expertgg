@@ -219,9 +219,7 @@ export default function MatchCard({
               ) : (
                 <>
                   <Text style={styles.voteButtonTitle}>Vote</Text>
-                  <Text style={styles.voteButtonSubtitle}>
-                    {chosenTeam && stake > 0 ? `win ${stake * 2}gg + bonus` : ' '}
-                  </Text>
+                  <Text style={styles.voteButtonSubtitle}>win x2gg</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -413,10 +411,10 @@ const styles = StyleSheet.create({
   },
   numpadRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 8,
   },
   numpadGrid: {
-    flex: 3,
     gap: 8,
   },
   numpadGridRow: {
@@ -442,7 +440,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   voteButton: {
-    flex: 2,
+    width: 78,
+    height: 74,
     borderRadius: 8,
     backgroundColor: '#FFA800',
     alignItems: 'center',
