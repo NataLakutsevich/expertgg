@@ -75,23 +75,27 @@ export default function GetCoinsScreen() {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Free Coins</Text>
-          <MaterialDesignIcons name="cash-multiple" size={56} color="#F5B417" style={styles.coinIcon} />
-          <TouchableOpacity
-            style={[styles.claimButton, isClaiming && styles.claimButtonDisabled]}
-            onPress={handleGetCoins}
-            disabled={isClaiming}>
-            {isClaiming ? (
-              <ActivityIndicator color={colors.background} />
-            ) : (
-              <>
-                <MaterialDesignIcons name="video-outline" size={18} color={colors.background} />
-                <Text style={styles.claimButtonText}>Get coins</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.cardTitle}>Free Coins</Text>
+        <Image
+          source={require('../assets/icons/coins.png')}
+          style={styles.coinIcon}
+          resizeMode="contain"
+        />
+        <TouchableOpacity
+          style={[styles.claimButton, isClaiming && styles.claimButtonDisabled]}
+          onPress={handleGetCoins}
+          disabled={isClaiming}>
+          {isClaiming ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <>
+              <View style={styles.claimButtonIconWrap}>
+                <MaterialDesignIcons name="play-box-outline" size={14} color="#FFFFFF" />
+              </View>
+              <Text style={styles.claimButtonText}>Get coins</Text>
+            </>
+          )}
+        </TouchableOpacity>
       </View>
 
       <InfoModal
@@ -154,39 +158,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-  },
-  card: {
-    width: '100%',
-    backgroundColor: colors.cardBackground,
-    borderRadius: 20,
-    paddingVertical: 32,
-    alignItems: 'center',
-    gap: 16,
+    gap: 24,
   },
   cardTitle: {
     color: colors.textPrimary,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
   },
   coinIcon: {
-    marginVertical: 4,
+    width: 160,
+    height: 160,
   },
   claimButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     width: formElementWidth,
-    backgroundColor: '#F5B417',
+    backgroundColor: colors.primary,
     borderRadius: 30,
-    paddingVertical: 14,
+    paddingVertical: 16,
+  },
+  claimButtonIconWrap: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   claimButtonDisabled: {
     opacity: 0.6,
   },
   claimButtonText: {
-    color: colors.background,
-    fontSize: 15,
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '700',
   },
 });
