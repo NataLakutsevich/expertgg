@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -21,6 +21,7 @@ import { useAuth } from '../auth/AuthContext';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { colors, formElementWidth } from '../theme/theme';
 import InfoModal, { InfoModalVariant } from '../components/InfoModal';
+import { useFocusPolling } from '../hooks/useFocusPolling';
 
 type ModalState = { visible: boolean; variant: InfoModalVariant; title: string; message?: string };
 const HIDDEN_MODAL: ModalState = { visible: false, variant: 'success', title: '' };
@@ -28,6 +29,7 @@ const HIDDEN_MODAL: ModalState = { visible: false, variant: 'success', title: ''
 // Avatar diameter as a fraction of screen width so it scales across devices
 // instead of staying a fixed 96dp regardless of resolution.
 const AVATAR_SIZE_PERCENT = 0.32;
+const POLL_INTERVAL_MS = 15000;
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
@@ -49,19 +51,17 @@ export default function AccountScreen() {
     try {
       const me = await getMe();
       setProfile(me);
-      setUsernameInput(me.username);
       setError(null);
     } catch (e) {
       if (!(e instanceof ApiError && e.status === 401)) {
         setError(e instanceof Error ? e.message : 'Something went wrong.');
       }
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    setIsLoading(true);
-    loadProfile().finally(() => setIsLoading(false));
-  }, [loadProfile]);
+  useFocusPolling(loadProfile, POLL_INTERVAL_MS);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
