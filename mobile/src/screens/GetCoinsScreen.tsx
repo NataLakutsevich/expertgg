@@ -96,7 +96,7 @@ export default function GetCoinsScreen() {
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <>
-              <MaterialDesignIcons name="play-box-outline" size={20} color="#FFFFFF" />
+              <Image source={require('../assets/icons/film.png')} style={styles.filmIcon} />
               <Text style={styles.claimButtonText}>Get coins</Text>
             </>
           )}
@@ -198,9 +198,14 @@ const styles = StyleSheet.create({
   claimButtonDisabled: {
     opacity: 0.6,
   },
+  filmIcon: {
+    width: 20,
+    height: 20,
+  },
   claimButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '500',
+    lineHeight: 18,
   },
 });
