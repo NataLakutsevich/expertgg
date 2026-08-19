@@ -269,8 +269,10 @@ const styles = StyleSheet.create({
   },
   videogame: {
     color: colors.textPrimary,
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: '600',
+    lineHeight: 10,
+    letterSpacing: -0.24,
     textAlign: 'center',
     marginBottom: 8,
   },
