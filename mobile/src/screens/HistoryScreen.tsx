@@ -38,7 +38,11 @@ function formatDate(value: string): string {
   // Force English regardless of device locale (was showing "19 авг." on
   // Russian-locale devices instead of "19 Aug").
   const day = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-  const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const time = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
   return `${day} ${time}`;
 }
 
