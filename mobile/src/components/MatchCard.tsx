@@ -261,7 +261,10 @@ const styles = StyleSheet.create({
   },
   tournament: {
     color: colors.textMuted,
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 14,
+    letterSpacing: -0.24,
     textAlign: 'center',
   },
   videogame: {
