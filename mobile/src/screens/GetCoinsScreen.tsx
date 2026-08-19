@@ -137,8 +137,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     flex: 1,
     color: colors.textPrimary,
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
+    lineHeight: 17,
+    letterSpacing: -0.41,
     textAlign: 'center',
   },
   balancePill: {
