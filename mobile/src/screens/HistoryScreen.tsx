@@ -276,15 +276,15 @@ const styles = StyleSheet.create({
   teamsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   teamBox: {
     flex: 1,
+    aspectRatio: 141 / 56, // fixed width:height ratio, so it scales with screen width
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 10,
     paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,

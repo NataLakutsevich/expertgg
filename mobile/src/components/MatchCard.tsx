@@ -273,11 +273,11 @@ const styles = StyleSheet.create({
   },
   teamBox: {
     flex: 1,
+    aspectRatio: 141 / 56, // fixed width:height ratio, so it scales with screen width
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 14,
     paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
