@@ -34,47 +34,62 @@ function formatDate(value: string): string {
   if (Number.isNaN(date.getTime())) {
     return value;
   }
-  return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  const day = date.toLocaleDateString([], { day: 'numeric', month: 'short' });
+  const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return `${day} ${time}`;
 }
 
-function formatDelta(item: BetHistoryEntry): { text: string; color: string } {
+function formatDelta(item: BetHistoryEntry): string {
   if (item.status === 'won') {
-    return { text: `+${item.payout} gg`, color: STATUS_COLOR.won };
+    return `+ ${item.payout} gg`;
   }
   if (item.status === 'lost') {
-    return { text: `-${item.stake} gg`, color: STATUS_COLOR.lost };
+    return `- ${item.stake} gg`;
   }
-  return { text: `${item.stake} gg`, color: colors.textMuted };
+  return `${item.stake} gg`;
 }
 
 function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
-  const delta = formatDelta(item);
+  const statusColor = STATUS_COLOR[item.status];
+  const isTeam1Chosen = item.chosen_team === item.team1_name;
+  const isTeam2Chosen = item.chosen_team === item.team2_name;
 
   return (
     <View style={styles.card}>
       <View style={styles.cardTopRow}>
-        <View style={[styles.statusBadge, { borderColor: STATUS_COLOR[item.status] }]}>
-          <Text style={[styles.statusBadgeText, { color: STATUS_COLOR[item.status] }]}>
+        <View style={[styles.statusBadge, { borderColor: statusColor }]}>
+          <Text style={[styles.statusBadgeText, { color: statusColor }]}>
             {STATUS_LABEL[item.status]}
           </Text>
         </View>
         <Text style={styles.tournament} numberOfLines={1}>
-          {item.tournament_name} • {item.videogame}
+          {item.videogame}:  {item.tournament_name}
         </Text>
       </View>
 
       <View style={styles.teamsRow}>
-        <Text
-          style={[styles.teamName, item.chosen_team === item.team1_name && styles.teamNameChosen]}
-          numberOfLines={1}>
-          {item.team1_name}
-        </Text>
-        <Text style={styles.vs}>VS</Text>
-        <Text
-          style={[styles.teamName, item.chosen_team === item.team2_name && styles.teamNameChosen]}
-          numberOfLines={1}>
-          {item.team2_name}
-        </Text>
+        <View style={[styles.teamBox, isTeam1Chosen && styles.teamBoxSelected]}>
+          <Text style={styles.teamBoxText} numberOfLines={1}>
+            {item.team1_name}
+          </Text>
+          <Image
+            source={require('../assets/icons/empty-state-swords.png')}
+            style={styles.teamLogo}
+            tintColor="#FFFFFF"
+            resizeMode="contain"
+          />
+        </View>
+        <View style={[styles.teamBox, isTeam2Chosen && styles.teamBoxSelected]}>
+          <Image
+            source={require('../assets/icons/empty-state-swords.png')}
+            style={styles.teamLogo}
+            tintColor="#FFFFFF"
+            resizeMode="contain"
+          />
+          <Text style={styles.teamBoxText} numberOfLines={1}>
+            {item.team2_name}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.cardBottomRow}>
@@ -89,7 +104,9 @@ function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
         ) : (
           <Text style={styles.date}>{formatDate(item.resolved_at ?? item.created_at)}</Text>
         )}
-        <Text style={[styles.delta, { color: delta.color }]}>{delta.text}</Text>
+        <View style={[styles.deltaBadge, { borderColor: statusColor }]}>
+          <Text style={[styles.deltaBadgeText, { color: statusColor }]}>{formatDelta(item)}</Text>
+        </View>
       </View>
     </View>
   );
@@ -256,23 +273,32 @@ const styles = StyleSheet.create({
   teamsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 8,
   },
-  teamName: {
+  teamBox: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#666C7C',
+  },
+  teamBoxSelected: {
+    borderColor: colors.primary,
+  },
+  teamBoxText: {
     color: colors.textPrimary,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    textAlign: 'center',
+    flexShrink: 1,
   },
-  teamNameChosen: {
-    color: colors.primary,
-  },
-  vs: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
+  teamLogo: {
+    width: 18,
+    height: 18,
   },
   cardBottomRow: {
     flexDirection: 'row',
@@ -287,8 +313,14 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontWeight: '700',
   },
-  delta: {
-    fontSize: 14,
+  deltaBadge: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  deltaBadgeText: {
+    fontSize: 13,
     fontWeight: '700',
   },
   error: {
