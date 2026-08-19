@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 17,
     letterSpacing: -0.24,
-    marginTop: 14,
+    marginTop: 24,
   },
   moneyBagIcon: {
     width: 35,
