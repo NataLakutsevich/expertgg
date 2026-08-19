@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   videogame: {
-    color: colors.textPrimary,
+    color: '#959595',
     fontSize: 10,
     fontWeight: '600',
     lineHeight: 10,
