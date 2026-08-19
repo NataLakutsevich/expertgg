@@ -117,10 +117,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.cardBackground,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
   },
   balanceText: {
     color: colors.textPrimary,
