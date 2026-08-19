@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   stepperBox: {
     flex: 3,
     flexDirection: 'row',
-    height: 44,
+    height: 32,
     borderRadius: 8,
     overflow: 'hidden',
   },
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   },
   smallButton: {
     flex: 1,
-    height: 44,
+    height: 32,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: BORDER,
@@ -421,11 +421,12 @@ const styles = StyleSheet.create({
   },
   numpadGridRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 8,
   },
   keypadKey: {
-    flex: 1,
-    height: 40,
+    width: 32,
+    height: 32,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: BORDER,
@@ -433,7 +434,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   keypadKeyWide: {
-    flex: 2,
+    width: 72, // two keys' width plus the gap between them
   },
   keypadKeyText: {
     color: colors.textPrimary,
