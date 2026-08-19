@@ -1,8 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getBetHistory, BetHistoryEntry, BetStatus } from '../api/matches';
+import { getMe } from '../api/account';
 import { ApiError } from '../api/http';
+import { RootStackParamList } from '../navigation/RootNavigator';
 import { colors } from '../theme/theme';
 import { useFocusPolling } from '../hooks/useFocusPolling';
 import { formatCountdown } from '../utils/countdown';
@@ -93,7 +97,9 @@ function HistoryCard({ item, now }: { item: BetHistoryEntry; now: number }) {
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [history, setHistory] = useState<BetHistoryEntry[]>([]);
+  const [balance, setBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -105,8 +111,9 @@ export default function HistoryScreen() {
 
   const loadHistory = useCallback(async () => {
     try {
-      const entries = await getBetHistory();
+      const [entries, profile] = await Promise.all([getBetHistory(), getMe()]);
       setHistory(entries);
+      setBalance(profile.gg_balance);
       setError(null);
     } catch (e) {
       if (!(e instanceof ApiError && e.status === 401)) {
@@ -121,7 +128,13 @@ export default function HistoryScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Text style={styles.header}>History</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.header}>History</Text>
+        <TouchableOpacity style={styles.balancePill} onPress={() => navigation.navigate('GetCoins')}>
+          <Text style={styles.balanceText}>{balance} gg</Text>
+          <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
+        </TouchableOpacity>
+      </View>
 
       {isLoading ? (
         <View style={styles.centered}>
@@ -156,12 +169,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
   header: {
     color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '700',
-    paddingHorizontal: 20,
-    paddingTop: 16,
+  },
+  balancePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.cardBackground,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  balanceText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 17,
+    letterSpacing: -0.24,
+    marginTop: 24,
+  },
+  moneyBagIcon: {
+    width: 35,
+    height: 34,
   },
   centered: {
     flex: 1,
