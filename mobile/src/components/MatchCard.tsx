@@ -7,24 +7,24 @@ import { formatCountdown } from '../utils/countdown';
 
 const STEP = 10;
 const MAX_STAKE_DIGITS = 6; // generous upper bound on typed stake length
+const BORDER = '#666C7C'; // team box / numpad key outline, per Figma Vote card spec
 
 function TeamLogo({ name, url }: { name: string; url: string }) {
   if (url) {
     return <Image source={{ uri: url }} style={styles.teamLogo} />;
   }
   return (
-    <View style={[styles.teamLogo, styles.teamLogoFallback]}>
-      <Text style={styles.teamLogoInitial}>{name.charAt(0).toUpperCase()}</Text>
-    </View>
+    <Image
+      source={require('../assets/icons/empty-state-swords.png')}
+      style={styles.teamLogo}
+      tintColor="#FFFFFF"
+      resizeMode="contain"
+    />
   );
 }
 
-const KEYPAD_ROWS: string[][] = [
-  ['1', '2', '3'],
-  ['4', '5', '6'],
-  ['7', '8', '9'],
-  ['00', '0', 'back'],
-];
+const NUMPAD_ROW_1 = ['1', '2', '3', '4', '5', '6'];
+const NUMPAD_ROW_2 = ['7', '8', '9', '0'];
 
 type Props = {
   match: Match;
@@ -78,11 +78,11 @@ export default function MatchCard({
   };
 
   const handleKeyPress = (key: string) => {
-    if (key === 'back') {
-      setStakeText(prev => prev.slice(0, -1));
-      return;
-    }
     setStakeText(prev => (prev + key).replace(/^0+(?=\d)/, '').slice(0, MAX_STAKE_DIGITS));
+  };
+
+  const handleBackspace = () => {
+    setStakeText(prev => prev.slice(0, -1));
   };
 
   const adjustStake = (delta: number) => {
@@ -111,42 +111,31 @@ export default function MatchCard({
       <View style={styles.teamsRow}>
         <TouchableOpacity
           style={[
-            styles.teamColumn,
-            chosenTeam === match.team1_name && isExpanded && styles.teamColumnSelected,
+            styles.teamBox,
+            chosenTeam === match.team1_name && isExpanded && styles.teamBoxSelected,
           ]}
           disabled={!canBet}
           onPress={() => handleSelectTeam(match.team1_name)}>
-          <TeamLogo name={match.team1_name} url={match.team1_logo_url} />
-          <Text style={styles.teamName} numberOfLines={1}>
+          <Text style={styles.teamBoxText} numberOfLines={1}>
             {match.team1_name}
           </Text>
+          <TeamLogo name={match.team1_name} url={match.team1_logo_url} />
         </TouchableOpacity>
 
         <Text style={styles.vs}>VS</Text>
 
         <TouchableOpacity
           style={[
-            styles.teamColumn,
-            chosenTeam === match.team2_name && isExpanded && styles.teamColumnSelected,
+            styles.teamBox,
+            chosenTeam === match.team2_name && isExpanded && styles.teamBoxSelected,
           ]}
           disabled={!canBet}
           onPress={() => handleSelectTeam(match.team2_name)}>
-          <TeamLogo name={match.team2_name} url={match.team2_logo_url} />
-          <Text style={styles.teamName} numberOfLines={1}>
+          <Text style={styles.teamBoxText} numberOfLines={1}>
             {match.team2_name}
           </Text>
+          <TeamLogo name={match.team2_name} url={match.team2_logo_url} />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.timerRow}>
-        <MaterialDesignIcons
-          name="clock-outline"
-          size={14}
-          color={match.status === 'running' ? colors.danger : colors.textMuted}
-        />
-        <Text style={[styles.timerText, match.status === 'running' && styles.timerTextLive]}>
-          {formatCountdown(match.scheduled_at, now, match.status)}
-        </Text>
       </View>
 
       {match.user_bet ? (
@@ -164,62 +153,91 @@ export default function MatchCard({
             {chosenTeam ? `${chosenTeam} wins` : 'Pick a team above'}
           </Text>
 
-          <View style={styles.stepperRow}>
-            <TouchableOpacity style={styles.stepperButton} onPress={() => adjustStake(-STEP)}>
-              <Text style={styles.stepperButtonText}>−</Text>
-            </TouchableOpacity>
-            <Text style={styles.stepperValue}>{stake} gg</Text>
-            <TouchableOpacity style={styles.stepperButton} onPress={() => adjustStake(STEP)}>
-              <Text style={styles.stepperButtonText}>+</Text>
-            </TouchableOpacity>
+          <View style={styles.controlsRow}>
+            <View style={styles.stepperBox}>
+              <TouchableOpacity style={styles.stepperSide} onPress={() => adjustStake(-STEP)}>
+                <Text style={styles.stepperSideText}>−</Text>
+              </TouchableOpacity>
+              <View style={styles.stepperValue}>
+                <Text style={styles.stepperValueText}>{stake}</Text>
+              </View>
+              <TouchableOpacity style={styles.stepperSide} onPress={() => adjustStake(STEP)}>
+                <Text style={styles.stepperSideText}>+</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.smallButtonGroup}>
+              <TouchableOpacity style={styles.smallButton} onPress={handleBackspace}>
+                <MaterialDesignIcons name="backspace-outline" size={18} color={colors.textPrimary} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.smallButton} onPress={handleCancel}>
+                <Text style={styles.smallButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <View style={styles.keypad}>
-            {KEYPAD_ROWS.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.keypadRow}>
-                {row.map(key => (
+          <View style={styles.numpadRow}>
+            <View style={styles.numpadGrid}>
+              <View style={styles.numpadGridRow}>
+                {NUMPAD_ROW_1.map(key => (
                   <TouchableOpacity
                     key={key}
                     style={styles.keypadKey}
                     onPress={() => handleKeyPress(key)}>
-                    {key === 'back' ? (
-                      <MaterialDesignIcons
-                        name="backspace-outline"
-                        size={18}
-                        color={colors.textPrimary}
-                      />
-                    ) : (
-                      <Text style={styles.keypadKeyText}>{key}</Text>
-                    )}
+                    <Text style={styles.keypadKeyText}>{key}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
-            ))}
-          </View>
+              <View style={styles.numpadGridRow}>
+                {NUMPAD_ROW_2.map(key => (
+                  <TouchableOpacity
+                    key={key}
+                    style={styles.keypadKey}
+                    onPress={() => handleKeyPress(key)}>
+                    <Text style={styles.keypadKeyText}>{key}</Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={[styles.keypadKey, styles.keypadKeyWide]}
+                  onPress={() => handleKeyPress('00')}>
+                  <Text style={styles.keypadKeyText}>00</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
-          {stakeExceedsBalance ? (
-            <Text style={styles.insufficientText}>Not enough gg — your balance is {balance}.</Text>
-          ) : null}
-
-          <View style={styles.actionsRow}>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.voteButton, voteDisabled && styles.voteButtonDisabled]}
               onPress={handleVote}
               disabled={voteDisabled}>
               {isSubmitting ? (
-                <ActivityIndicator color={colors.background} />
+                <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.voteButtonText}>
-                  {chosenTeam && stake > 0 ? `Vote — win ${stake * 2} gg` : 'Vote'}
-                </Text>
+                <>
+                  <Text style={styles.voteButtonTitle}>Vote</Text>
+                  <Text style={styles.voteButtonSubtitle}>
+                    {chosenTeam && stake > 0 ? `win ${stake * 2}gg + bonus` : ' '}
+                  </Text>
+                </>
               )}
             </TouchableOpacity>
           </View>
+
+          {stakeExceedsBalance ? (
+            <Text style={styles.insufficientText}>Not enough gg — your balance is {balance}.</Text>
+          ) : null}
         </View>
       ) : null}
+
+      <View style={styles.timerRow}>
+        <MaterialDesignIcons
+          name="clock-outline"
+          size={14}
+          color={match.status === 'running' ? colors.danger : colors.textMuted}
+        />
+        <Text style={[styles.timerText, match.status === 'running' && styles.timerTextLive]}>
+          {formatCountdown(match.scheduled_at, now, match.status)}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -227,7 +245,7 @@ export default function MatchCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.cardBackground,
-    borderRadius: 14,
+    borderRadius: 8,
     padding: 16,
     gap: 4,
   },
@@ -246,47 +264,49 @@ const styles = StyleSheet.create({
   teamsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 10,
   },
-  teamColumn: {
+  teamBox: {
     flex: 1,
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  teamColumnSelected: {
-    borderColor: colors.primary,
-    backgroundColor: 'rgba(59, 111, 224, 0.12)',
-  },
-  teamLogo: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  },
-  teamLogoFallback: {
-    backgroundColor: colors.primary,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  teamLogoInitial: {
+  teamBoxSelected: {
+    borderColor: colors.primary,
+  },
+  teamBoxText: {
     color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '700',
-  },
-  teamName: {
-    color: colors.textPrimary,
-    fontSize: 13,
     fontWeight: '600',
-    maxWidth: 110,
+    flexShrink: 1,
+  },
+  teamLogo: {
+    width: 22,
+    height: 22,
   },
   vs: {
-    color: colors.textMuted,
-    fontSize: 12,
+    color: colors.textPrimary,
+    fontSize: 15,
     fontWeight: '700',
-    marginHorizontal: 8,
+  },
+  betBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  betBadgeText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   timerRow: {
     flexDirection: 'row',
@@ -303,23 +323,11 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontWeight: '700',
   },
-  betBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginTop: 8,
-  },
-  betBadgeText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
   betPanel: {
     marginTop: 14,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: BORDER,
     gap: 12,
   },
   betPanelTitle: {
@@ -328,91 +336,112 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
-  stepperRow: {
+  controlsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 20,
-  },
-  stepperButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepperButtonText: {
-    color: colors.textPrimary,
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  stepperValue: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '700',
-    minWidth: 90,
-    textAlign: 'center',
-  },
-  keypad: {
     gap: 8,
   },
-  keypadRow: {
+  stepperBox: {
+    flex: 3,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    height: 44,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  stepperSide: {
+    width: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EBEBE9',
+  },
+  stepperSideText: {
+    color: '#090C15',
+    fontSize: 22,
+    fontWeight: '600',
+  },
+  stepperValue: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  stepperValueText: {
+    color: '#090C15',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  smallButtonGroup: {
+    flex: 2,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  smallButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: BORDER,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  smallButtonText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  numpadRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  numpadGrid: {
+    flex: 3,
+    gap: 8,
+  },
+  numpadGridRow: {
+    flexDirection: 'row',
     gap: 8,
   },
   keypadKey: {
     flex: 1,
     height: 40,
-    borderRadius: 10,
-    backgroundColor: colors.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: BORDER,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  keypadKeyWide: {
+    flex: 2,
+  },
   keypadKeyText: {
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
+  },
+  voteButton: {
+    flex: 2,
+    borderRadius: 8,
+    backgroundColor: '#FFA800',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  voteButtonDisabled: {
+    opacity: 0.4,
+  },
+  voteButtonTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  voteButtonSubtitle: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   insufficientText: {
     color: colors.danger,
     fontSize: 12,
     textAlign: 'center',
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cancelButtonText: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  voteButton: {
-    flex: 1.4,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F5B417',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  voteButtonDisabled: {
-    opacity: 0.4,
-  },
-  voteButtonText: {
-    color: colors.background,
-    fontSize: 14,
-    fontWeight: '700',
   },
 });
