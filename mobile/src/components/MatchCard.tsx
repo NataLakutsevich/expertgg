@@ -253,8 +253,11 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.cardBackground,
     borderRadius: 8,
-    padding: 16,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 0,
     gap: 4,
+    overflow: 'hidden',
   },
   tournament: {
     color: colors.textMuted,
