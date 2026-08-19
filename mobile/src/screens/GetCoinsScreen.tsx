@@ -75,32 +75,34 @@ export default function GetCoinsScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.cardTitle}>Free Coins</Text>
-        <View style={styles.coinWrap}>
-          <Image
-            source={require('../assets/icons/coins-glow.png')}
-            style={styles.coinGlow}
-            resizeMode="contain"
-          />
-          <Image
-            source={require('../assets/icons/coins.png')}
-            style={styles.coinIcon}
-            resizeMode="contain"
-          />
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Free Coins</Text>
+          <View style={styles.coinWrap}>
+            <Image
+              source={require('../assets/icons/coins-glow.png')}
+              style={styles.coinGlow}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('../assets/icons/coins.png')}
+              style={styles.coinIcon}
+              resizeMode="contain"
+            />
+          </View>
+          <TouchableOpacity
+            style={[styles.claimButton, isClaiming && styles.claimButtonDisabled]}
+            onPress={handleGetCoins}
+            disabled={isClaiming}>
+            {isClaiming ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Image source={require('../assets/icons/film.png')} style={styles.filmIcon} />
+                <Text style={styles.claimButtonText}>Get coins</Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[styles.claimButton, isClaiming && styles.claimButtonDisabled]}
-          onPress={handleGetCoins}
-          disabled={isClaiming}>
-          {isClaiming ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <>
-              <Image source={require('../assets/icons/film.png')} style={styles.filmIcon} />
-              <Text style={styles.claimButtonText}>Get coins</Text>
-            </>
-          )}
-        </TouchableOpacity>
       </View>
 
       <InfoModal
@@ -162,7 +164,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
+  },
+  card: {
+    width: '100%',
+    height: 330,
+    backgroundColor: colors.cardBackground,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 24,
   },
   cardTitle: {
