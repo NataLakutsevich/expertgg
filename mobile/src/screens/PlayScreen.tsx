@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -31,11 +31,29 @@ export default function PlayScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modal, setModal] = useState<ModalState>(HIDDEN_MODAL);
   const [now, setNow] = useState(() => Date.now());
+  const listRef = useRef<FlatList<Match>>(null);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
     return () => clearInterval(id);
   }, []);
+
+  // Scroll the just-expanded card to the top so its whole bet panel (stepper,
+  // numpad, Vote button) is visible instead of just peeking in at the bottom.
+  // The short delay lets the row's expanded layout commit first.
+  useEffect(() => {
+    if (expandedId == null) {
+      return;
+    }
+    const index = matches.findIndex(m => m.id === expandedId);
+    if (index === -1) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      listRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0 });
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [expandedId, matches]);
 
   const loadData = useCallback(async () => {
     try {
@@ -117,10 +135,17 @@ export default function PlayScreen() {
         </View>
       ) : (
         <FlatList
+          ref={listRef}
           data={matches}
           keyExtractor={item => String(item.id)}
           contentContainerStyle={styles.listContent}
           extraData={[expandedId, now, isSubmitting, balance]}
+          onScrollToIndexFailed={info => {
+            listRef.current?.scrollToOffset({
+              offset: info.averageItemLength * info.index,
+              animated: true,
+            });
+          }}
           renderItem={({ item }) => (
             <MatchCard
               match={item}
