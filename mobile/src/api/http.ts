@@ -30,7 +30,12 @@ async function refreshAccessToken(): Promise<string | null> {
     if (!data?.access) {
       return null;
     }
-    await saveTokens({ access: data.access, refresh });
+    // The backend rotates refresh tokens (ROTATE_REFRESH_TOKENS) and
+    // blacklists the old one on use, so the response always carries a new
+    // refresh token that must replace the stored one — reusing the old
+    // (now-blacklisted) refresh here caused the next refresh cycle to fail
+    // and force-logout the user roughly every access-token lifetime.
+    await saveTokens({ access: data.access, refresh: data.refresh ?? refresh });
     return data.access;
   } catch {
     return null;
