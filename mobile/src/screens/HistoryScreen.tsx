@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.textMuted,
     fontSize: 12,
+    textAlign: 'right',
   },
   teamsRow: {
     flexDirection: 'row',
