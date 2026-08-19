@@ -42,7 +42,13 @@ export default function PlayScreen() {
       const [allMatches, profile] = await Promise.all([getMatches(), getMe()]);
       // Curator-confirmed: betting is strictly upcoming-only, so running/live
       // matches (no longer bettable) do not belong in the Play list either.
-      const playable = allMatches.filter(m => m.status === 'upcoming');
+      // Also drop "upcoming" matches whose scheduled_at has already passed —
+      // PandaScore/the sync cron can lag up to a minute behind the actual
+      // start, and those show a stale "Starting..." countdown in the meantime.
+      const now = Date.now();
+      const playable = allMatches.filter(
+        m => m.status === 'upcoming' && new Date(m.scheduled_at).getTime() > now,
+      );
       setMatches(playable);
       setBalance(profile.gg_balance);
       setError(null);
