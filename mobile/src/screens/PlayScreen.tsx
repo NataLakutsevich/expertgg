@@ -40,7 +40,9 @@ export default function PlayScreen() {
   const loadData = useCallback(async () => {
     try {
       const [allMatches, profile] = await Promise.all([getMatches(), getMe()]);
-      const playable = allMatches.filter(m => m.status === 'upcoming' || m.status === 'running');
+      // Curator-confirmed: betting is strictly upcoming-only, so running/live
+      // matches (no longer bettable) do not belong in the Play list either.
+      const playable = allMatches.filter(m => m.status === 'upcoming');
       setMatches(playable);
       setBalance(profile.gg_balance);
       setError(null);
