@@ -11,7 +11,7 @@ export type TabParamList = {
   Play: undefined;
   History: undefined;
   Leaders: undefined;
-  Account: undefined;
+  Account: { isEditing?: boolean } | undefined;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -56,7 +56,14 @@ export default function TabNavigator() {
         tabBarActiveTintColor: colors.textPrimary,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: styles.tabBar,
-        tabBarIcon: ({ color }) => renderTabIcon(route.name as keyof TabParamList, color),
+        tabBarIcon: ({ color }) => {
+          const isEditingAccount =
+            route.name === 'Account' && (route.params as { isEditing?: boolean } | undefined)?.isEditing;
+          return renderTabIcon(
+            route.name as keyof TabParamList,
+            isEditingAccount ? colors.primary : color,
+          );
+        },
       })}>
       <Tab.Screen name="Play" component={PlayScreen} />
       <Tab.Screen name="History" component={HistoryScreen} />

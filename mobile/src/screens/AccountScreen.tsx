@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -62,6 +62,12 @@ export default function AccountScreen() {
   }, []);
 
   useFocusPolling(loadProfile, POLL_INTERVAL_MS);
+
+  // Lets the tab bar highlight the Account icon blue only while actively
+  // editing, instead of just whenever this tab happens to be focused.
+  useEffect(() => {
+    (navigation as any).setParams({ isEditing: mode === 'edit' });
+  }, [mode, navigation]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -188,14 +194,26 @@ export default function AccountScreen() {
                   </TouchableOpacity>
                 </>
               ) : (
-                <TextInput
-                  style={styles.usernameInput}
-                  value={usernameInput}
-                  onChangeText={setUsernameInput}
-                  placeholder="Username"
-                  placeholderTextColor={colors.textMuted}
-                  autoCapitalize="none"
-                />
+                <>
+                  <TextInput
+                    style={styles.usernameInput}
+                    value={usernameInput}
+                    onChangeText={setUsernameInput}
+                    placeholder="Username"
+                    placeholderTextColor={colors.textMuted}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    style={[styles.saveButton, isSaving && styles.buttonDisabled]}
+                    onPress={handleSave}
+                    disabled={isSaving}>
+                    {isSaving ? (
+                      <ActivityIndicator color={colors.textPrimary} />
+                    ) : (
+                      <Text style={styles.saveButtonText}>Save</Text>
+                    )}
+                  </TouchableOpacity>
+                </>
               )}
 
               {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -203,22 +221,7 @@ export default function AccountScreen() {
           )}
         </View>
 
-        {mode === 'edit' ? (
-          <TouchableOpacity
-            style={[
-              styles.saveButton,
-              { marginBottom: 90 + insets.bottom },
-              isSaving && styles.buttonDisabled,
-            ]}
-            onPress={handleSave}
-            disabled={isSaving}>
-            {isSaving ? (
-              <ActivityIndicator color={colors.textPrimary} />
-            ) : (
-              <Text style={styles.saveButtonText}>Save</Text>
-            )}
-          </TouchableOpacity>
-        ) : (
+        {mode === 'view' ? (
           <TouchableOpacity
             style={[
               styles.logoutButton,
@@ -233,7 +236,7 @@ export default function AccountScreen() {
               <Text style={styles.logoutButtonText}>Log out</Text>
             )}
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
 
       <InfoModal
@@ -362,6 +365,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     width: formElementWidth,
+    marginTop: 20,
     backgroundColor: colors.primary,
     borderRadius: 30,
     paddingVertical: 14,
