@@ -183,7 +183,7 @@ export default function AccountScreen() {
                   <Text style={styles.username}>{profile?.username}</Text>
                   <Text style={styles.email}>{profile?.email}</Text>
                   <TouchableOpacity style={styles.editButton} onPress={handleStartEdit}>
-                    <MaterialDesignIcons name="pencil-outline" size={16} color="#FFFFFF" />
+                    <Image source={require('../assets/icons/edit-pencil.png')} style={styles.editIcon} />
                     <Text style={styles.editButtonText}>Edit profile</Text>
                   </TouchableOpacity>
                 </>
@@ -336,6 +336,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingVertical: 14,
     marginTop: 8,
+  },
+  editIcon: {
+    width: 18,
+    height: 18,
   },
   editButtonText: {
     color: '#FFFFFF',
