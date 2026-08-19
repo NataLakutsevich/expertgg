@@ -88,11 +88,8 @@ export default function PlayScreen() {
         <TouchableOpacity
           style={styles.balancePill}
           onPress={() => navigation.navigate('GetCoins')}>
-          <MaterialDesignIcons name="wallet-outline" size={16} color={colors.textPrimary} />
           <Text style={styles.balanceText}>{balance} gg</Text>
-          <View style={styles.plusBadge}>
-            <MaterialDesignIcons name="plus" size={10} color={colors.background} />
-          </View>
+          <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
         </TouchableOpacity>
       </View>
 
@@ -170,15 +167,13 @@ const styles = StyleSheet.create({
   balanceText: {
     color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
+    lineHeight: 14,
+    letterSpacing: -0.24,
   },
-  plusBadge: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#F5B417',
-    alignItems: 'center',
-    justifyContent: 'center',
+  moneyBagIcon: {
+    width: 35,
+    height: 34,
   },
   centered: {
     flex: 1,

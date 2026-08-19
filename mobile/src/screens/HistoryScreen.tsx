@@ -20,9 +20,15 @@ const STATUS_COLOR: Record<BetStatus, string> = {
   active: '#F5B417',
 };
 
+// For Win/Lose, shows when the match actually finished and the payout was
+// resolved (resolved_at) rather than when the bet was originally placed.
+// Active bets have no resolved_at yet, so they fall back to created_at.
 function formatDate(value: string): string {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString();
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 }
 
 function formatDelta(item: BetHistoryEntry): { text: string; color: string } {
@@ -66,7 +72,7 @@ function HistoryCard({ item }: { item: BetHistoryEntry }) {
       </View>
 
       <View style={styles.cardBottomRow}>
-        <Text style={styles.date}>{formatDate(item.created_at)}</Text>
+        <Text style={styles.date}>{formatDate(item.resolved_at ?? item.created_at)}</Text>
         <Text style={[styles.delta, { color: delta.color }]}>{delta.text}</Text>
       </View>
     </View>

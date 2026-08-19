@@ -7,22 +7,33 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { launchImageLibrary } from 'react-native-image-picker';
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
 import { getMe, updateMe, logoutRequest, AccountProfile } from '../api/account';
 import { resolveAvatarUrl } from '../api/leaderboard';
 import { ApiError } from '../api/http';
 import { useAuth } from '../auth/AuthContext';
+import { RootStackParamList } from '../navigation/RootNavigator';
 import { colors, formElementWidth } from '../theme/theme';
 import InfoModal, { InfoModalVariant } from '../components/InfoModal';
 
 type ModalState = { visible: boolean; variant: InfoModalVariant; title: string; message?: string };
 const HIDDEN_MODAL: ModalState = { visible: false, variant: 'success', title: '' };
 
+// Avatar diameter as a fraction of screen width so it scales across devices
+// instead of staying a fixed 96dp regardless of resolution.
+const AVATAR_SIZE_PERCENT = 0.32;
+
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const avatarSize = width * AVATAR_SIZE_PERCENT;
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { logout } = useAuth();
   const [profile, setProfile] = useState<AccountProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,12 +84,6 @@ export default function AccountScreen() {
     setMode('edit');
   };
 
-  const handleCancelEdit = () => {
-    setPendingAvatarUri(null);
-    setUsernameInput(profile?.username ?? '');
-    setMode('view');
-  };
-
   const handleSave = async () => {
     const trimmed = usernameInput.trim();
     if (!trimmed) {
@@ -119,11 +124,10 @@ export default function AccountScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>Account</Text>
-        {mode === 'edit' ? (
-          <TouchableOpacity onPress={handleCancelEdit}>
-            <Text style={styles.cancelLink}>Cancel</Text>
-          </TouchableOpacity>
-        ) : null}
+        <TouchableOpacity style={styles.balancePill} onPress={() => navigation.navigate('GetCoins')}>
+          <Text style={styles.balanceText}>{profile?.gg_balance ?? 0} gg</Text>
+          <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -133,19 +137,43 @@ export default function AccountScreen() {
           ) : (
             <>
               <TouchableOpacity
-                style={styles.avatarWrap}
+                style={{ width: avatarSize, height: avatarSize, marginBottom: 8 }}
                 disabled={mode !== 'edit'}
                 onPress={handlePickAvatar}>
                 {avatarUrl ? (
-                  <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+                  <Image
+                    source={{ uri: avatarUrl }}
+                    resizeMode="cover"
+                    style={[
+                      styles.avatarBorder,
+                      { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 },
+                    ]}
+                  />
                 ) : (
-                  <View style={[styles.avatarImage, styles.avatarFallback]}>
+                  <View
+                    style={[
+                      styles.avatarFallback,
+                      styles.avatarBorder,
+                      { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 },
+                    ]}>
                     <Text style={styles.avatarInitial}>{initial}</Text>
                   </View>
                 )}
                 {mode === 'edit' ? (
-                  <View style={styles.avatarPlusBadge}>
-                    <MaterialDesignIcons name="plus" size={14} color={colors.textPrimary} />
+                  <View
+                    style={[
+                      styles.avatarPlusBadge,
+                      {
+                        width: avatarSize * 0.32,
+                        height: avatarSize * 0.32,
+                        borderRadius: (avatarSize * 0.32) / 2,
+                      },
+                    ]}>
+                    <MaterialDesignIcons
+                      name="plus"
+                      size={avatarSize * 0.18}
+                      color="#FFFFFF"
+                    />
                   </View>
                 ) : null}
               </TouchableOpacity>
@@ -155,11 +183,7 @@ export default function AccountScreen() {
                   <Text style={styles.username}>{profile?.username}</Text>
                   <Text style={styles.email}>{profile?.email}</Text>
                   <TouchableOpacity style={styles.editButton} onPress={handleStartEdit}>
-                    <MaterialDesignIcons
-                      name="pencil-outline"
-                      size={16}
-                      color={colors.textPrimary}
-                    />
+                    <MaterialDesignIcons name="pencil-outline" size={16} color="#FFFFFF" />
                     <Text style={styles.editButtonText}>Edit profile</Text>
                   </TouchableOpacity>
                 </>
@@ -240,11 +264,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
   },
-  cancelLink: {
-    color: colors.textMuted,
-    fontSize: 15,
-    fontWeight: '600',
-  },
   content: {
     flex: 1,
     alignItems: 'center',
@@ -257,15 +276,9 @@ const styles = StyleSheet.create({
     gap: 8,
     width: '100%',
   },
-  avatarWrap: {
-    width: 96,
-    height: 96,
-    marginBottom: 8,
-  },
-  avatarImage: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+  avatarBorder: {
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   avatarFallback: {
     backgroundColor: colors.primary,
@@ -281,14 +294,27 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     bottom: 0,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
     backgroundColor: colors.primary,
     borderWidth: 2,
     borderColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  balancePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  balanceText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 14,
+    letterSpacing: -0.24,
+  },
+  moneyBagIcon: {
+    width: 35,
+    height: 34,
   },
   username: {
     color: colors.textPrimary,
@@ -303,28 +329,30 @@ const styles = StyleSheet.create({
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 20,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
+    width: formElementWidth,
+    backgroundColor: colors.primary,
+    borderRadius: 30,
+    paddingVertical: 14,
+    marginTop: 8,
   },
   editButtonText: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
   usernameInput: {
     width: formElementWidth,
-    backgroundColor: colors.surface,
-    borderRadius: 24,
+    backgroundColor: 'transparent',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingHorizontal: 20,
     paddingVertical: 14,
     color: colors.textPrimary,
     fontSize: 16,
-    textAlign: 'center',
-    marginTop: 8,
+    marginTop: 24,
   },
   saveButton: {
     width: formElementWidth,

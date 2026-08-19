@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -69,8 +69,8 @@ export default function GetCoinsScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Get coins</Text>
         <View style={styles.balancePill}>
-          <MaterialDesignIcons name="wallet-outline" size={16} color={colors.textPrimary} />
           <Text style={styles.balanceText}>{isLoading ? '…' : `${balance} gg`}</Text>
+          <Image source={require('../assets/icons/money-bag.png')} style={styles.moneyBagIcon} />
         </View>
       </View>
 
@@ -138,10 +138,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
+  moneyBagIcon: {
+    width: 35,
+    height: 34,
+  },
   balanceText: {
     color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
+    lineHeight: 14,
+    letterSpacing: -0.24,
   },
   content: {
     flex: 1,
