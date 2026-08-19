@@ -353,8 +353,10 @@ const styles = StyleSheet.create({
   },
   betPanelTitle: {
     color: colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 12,
+    letterSpacing: -0.24,
     textAlign: 'center',
   },
   controlsRow: {
