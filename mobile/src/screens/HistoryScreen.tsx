@@ -35,8 +35,10 @@ function formatDate(value: string): string {
   if (Number.isNaN(date.getTime())) {
     return value;
   }
-  const day = date.toLocaleDateString([], { day: 'numeric', month: 'short' });
-  const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Force English regardless of device locale (was showing "19 авг." on
+  // Russian-locale devices instead of "19 Aug").
+  const day = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   return `${day} ${time}`;
 }
 
