@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 17,
     letterSpacing: -0.24,
-    marginTop: 9,
+    marginTop: 14,
   },
   content: {
     flex: 1,
